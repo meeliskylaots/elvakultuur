@@ -79,8 +79,11 @@
         .poster {
             width: 35%;
             height: 100%;
-            background-color: #000;
+            background-color: #0d1117; /* Asendab musta tausta natuke pehmemaga */
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .poster img {
@@ -244,15 +247,18 @@
                     `;
                 }
 
+                const fallbackImg = 'https://via.placeholder.com/600x800/161b22/58a6ff?text=Kultuuris%C3%BCndmus';
                 const imageUrl = row['Plakat (URL)'] && row['Plakat (URL)'].length > 5 
                     ? row['Plakat (URL)'] 
-                    : 'https://via.placeholder.com/600x800/161b22/58a6ff?text=Kultuuris%C3%BCndmus';
+                    : fallbackImg;
 
                 const timeString = row.Aeg ? ` kell ${row.Aeg}` : '';
 
+                // Onerror lisamine hoolitseb selle eest, et kui päris pildi laadimine ebaõnnestub (katkine link vms), 
+                // siis kuvatakse automaatselt asenduspilt ja musti kaste ei teki.
                 card.innerHTML = `
                     <div class="poster">
-                        <img src="${imageUrl}" alt="Plakat">
+                        <img src="${imageUrl}" alt="Plakat" onerror="this.onerror=null;this.src='${fallbackImg}';">
                     </div>
                     <div class="info">
                         <div class="date-time">${row['Kuupäev']}${timeString}</div>
@@ -300,12 +306,11 @@
                 const rowSelectors = '.views-row, .event-item, article.node--type-event, .node--view-mode-teaser, .search-result-item, .card, .event-card, .event-row';
                 let rows = Array.from(doc.querySelectorAll(rowSelectors));
                 
-                // 3. ÜLIM VARUPLAAN: Kui klasse ei leitud, otsime kõiki sündmuse linke ja võtame nende ümbrise!
+                // 3. ÜLIM VARUPLAAN: Kui klasse ei leitud, otsime kõiki sündmuse linke ja võtame nende ümbrise
                 if (rows.length === 0) {
                     const eventLinks = doc.querySelectorAll('a[href*="/syndmus/"], a[href*="/event/"]');
                     const uniqueRows = new Set();
                     eventLinks.forEach(link => {
-                        // Leiame lähima mõistliku suurusega kasti, mis linki ümbritseb
                         const container = link.closest('article, li, div[class*="item"], div[class*="card"], div[class*="row"]');
                         if (container && container.innerText.trim().length > 15) {
                             uniqueRows.add(container);
@@ -328,9 +333,26 @@
 
                     if (!title) return null;
 
-                    // Pilt
-                    const imgNode = row.querySelector('img');
-                    let imgUrl = imgNode ? imgNode.getAttribute('src') : '';
+                    // Pilt (Laiendatud otsing, sh lazy-load atribuudid)
+                    let imgNode = row.querySelector('img');
+                    
+                    // Kui linkide sees pole otsest img tagi, otsime varuplaanina kogu rea seest 
+                    if (!imgNode) {
+                         const parent = row.parentElement;
+                         if(parent) imgNode = parent.querySelector('img');
+                    }
+
+                    let imgUrl = '';
+                    if (imgNode) {
+                        // Paljud lehed kasutavad data-src või laisklaadimist
+                        imgUrl = imgNode.getAttribute('data-src') || imgNode.getAttribute('src') || imgNode.getAttribute('data-original') || '';
+                        
+                        // Ignoreerime väikseid ikoone või asjatuid SVG-sid, kui need eksikombel leiti
+                        if (imgUrl.includes('.svg') || imgUrl.includes('icon')) {
+                            imgUrl = '';
+                        }
+                    }
+
                     if (imgUrl && imgUrl.startsWith('/')) {
                         imgUrl = 'https://kultuuriaken.tartu.ee' + imgUrl;
                     }
@@ -339,7 +361,6 @@
                     const dateNode = row.querySelector('.views-field-field-event-date, .field--name-field-event-date, .event-date, .date, time');
                     let dateText = dateNode ? dateNode.innerText.replace(/\s+/g, ' ').trim() : '';
                     
-                    // Kui otsene klass puudub, proovime tekstist kuupäeva mustrit leida (nt "12. märts | 18:00")
                     if (!dateText) {
                         const dateMatch = row.innerText.match(/\d{1,2}\.\s*[a-zA-ZäöüõÄÖÜÕ]+\s*(\|\s*\d{2}:\d{2})?/);
                         if (dateMatch) dateText = dateMatch[0];
@@ -348,20 +369,29 @@
                     // Asukoht
                     const locNode = row.querySelector('.views-field-field-place, .field--name-field-place, .event-location, .location');
                     let locText = locNode ? locNode.innerText.replace(/\s+/g, ' ').trim() : '';
-                    if (!locText) locText = "Elva vald";
                     
                     // Lühikirjeldus
                     const descNode = row.querySelector('.views-field-body, .field--name-body, .event-description, .description, p');
-                    const descText = descNode ? descNode.innerText.replace(/\s+/g, ' ').trim() : '';
+                    let descText = descNode ? descNode.innerText.replace(/\s+/g, ' ').trim() : '';
+
+                    // Kui spetsiifilist asukohta ei leitud, aga kirjeldus sisaldab rahvamaja vms, korrigeerime seda
+                    if (!locText) {
+                        if (descText && (descText.includes("Rahvamaja") || descText.includes("Keskus") || descText.includes("Kool"))) {
+                            locText = descText;
+                            descText = ""; // Puhastame kirjelduse, kuna see oli tegelikult asukoht
+                        } else {
+                            locText = "Elva vald";
+                        }
+                    }
 
                     return {
                         Nimi: title,
                         Kuupäev: dateText,
-                        Aeg: '', // Jätame tühjaks, info on Kuupäeva tekstis
+                        Aeg: '',
                         Koht: locText,
                         Kirjeldus: descText,
                         'Plakat (URL)': imgUrl,
-                        Piletilink: '' // Lingi eraldamine on keeruline
+                        Piletilink: ''
                     };
                 }).filter(item => item !== null && item.Nimi.length > 0);
 
