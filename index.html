@@ -202,6 +202,7 @@
 
             for (let proxy of proxies) {
                 try {
+                    console.log(`Proovin andmeid laadida läbi: ${proxy}`);
                     const response = await fetch(proxy);
                     if (response.ok) {
                         return await response.text();
@@ -296,12 +297,21 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(htmlText, "text/html");
                 
-                // Otsime sündmuste elemente (.views-row on Kultuuriaknas standardne sündmuse konteiner)
-                const rows = doc.querySelectorAll('.views-row');
+                // Otsime sündmuste elemente - LISATUD ROHKEM VÕIMALIKKE KLASSE (laiem otsing)
+                const rowSelectors = '.views-row, .event-item, article.node--type-event, .node--view-mode-teaser, .search-result-item, .card, .event-card, .event-row';
+                const rows = doc.querySelectorAll(rowSelectors);
                 
+                // VEAOTSINGU ABIMEES: Kui ei leitud ühtegi kasti
+                if (rows.length === 0) {
+                    console.warn("DOM ei leidnud ühtegi sündmuse elementi! Kas Kultuuriaken muutis disaini, leht on tühi (URL-i filter) või proxy on blokeeritud?");
+                    console.log("Allalaaditud HTML sisu algus:", htmlText.substring(0, 1500));
+                    document.getElementById('container').innerHTML = `<div class="status-message">Hetkel otsitavaid sündmusi ei leitud.<br><span style="font-size:1rem; opacity:0.7;">(Vajuta F12 ja vaata Console vahelehte detailide jaoks)</span></div>`;
+                    return;
+                }
+
                 const parsedData = Array.from(rows).map(row => {
-                    // Pealkiri
-                    const titleNode = row.querySelector('.views-field-title a, .node__title a, h2 a, h3 a');
+                    // Pealkiri (laiendatud otsing)
+                    const titleNode = row.querySelector('.views-field-title a, .node__title a, h2 a, h3 a, h2, h3, .title');
                     const title = titleNode ? titleNode.innerText.trim() : '';
 
                     if (!title) return null;
@@ -314,17 +324,17 @@
                         imgUrl = 'https://kultuuriaken.tartu.ee' + imgUrl;
                     }
 
-                    // Kuupäev ja aeg (Kultuuriaknas on need HTML-is sageli samas lahtris)
-                    const dateNode = row.querySelector('.views-field-field-event-date, .field--name-field-event-date');
+                    // Kuupäev ja aeg (laiendatud otsing)
+                    const dateNode = row.querySelector('.views-field-field-event-date, .field--name-field-event-date, .event-date, .date, time');
                     const dateText = dateNode ? dateNode.innerText.replace(/\s+/g, ' ').trim() : '';
 
-                    // Asukoht
-                    const locNode = row.querySelector('.views-field-field-place, .field--name-field-place');
+                    // Asukoht (laiendatud otsing)
+                    const locNode = row.querySelector('.views-field-field-place, .field--name-field-place, .event-location, .location');
                     let locText = locNode ? locNode.innerText.replace(/\s+/g, ' ').trim() : '';
                     if (!locText) locText = "Elva vald";
                     
-                    // Lühikirjeldus
-                    const descNode = row.querySelector('.views-field-body, .field--name-body');
+                    // Lühikirjeldus (laiendatud otsing)
+                    const descNode = row.querySelector('.views-field-body, .field--name-body, .event-description, .description');
                     const descText = descNode ? descNode.innerText.replace(/\s+/g, ' ').trim() : '';
 
                     return {
@@ -334,19 +344,19 @@
                         Koht: locText,
                         Kirjeldus: descText,
                         'Plakat (URL)': imgUrl,
-                        Piletilink: '' // Lingi eraldamine Kultuuriakna üldnimekirjast on keeruline, seega QR kood peidetakse
+                        Piletilink: '' // Lingi eraldamine Kultuuriakna üldnimekirjast on keeruline
                     };
                 }).filter(item => item !== null);
 
                 if (parsedData.length > 0) {
                     renderEvents(parsedData);
                 } else {
-                    document.getElementById('container').innerHTML = `<div class="status-message">Hetkel otsitavaid sündmusi ei leitud.</div>`;
+                    document.getElementById('container').innerHTML = `<div class="status-message">Sündmusi leiti, aga vigase pealkirjaga.</div>`;
                 }
 
             } catch (error) {
                 console.error("Viga andmete laadimisel:", error);
-                document.getElementById('container').innerHTML = `<div class="status-message" style="color: #ff6b6b;">Viga andmete laadimisel Kultuuriaknast.<br><span style="font-size:1.2rem; display:block; margin-top:15px; color:#c9d1d9;">Märkus: Gemini turvapiirangud võivad siin eelvaates laadimist blokeerida.<br>Õigeks tööks laadi kood <b>.html</b> failina alla ja ava oma brauseris (nt Chrome).</span></div>`;
+                document.getElementById('container').innerHTML = `<div class="status-message" style="color: #ff6b6b;">Viga andmete laadimisel Kultuuriaknast.</div>`;
             }
         }
 
