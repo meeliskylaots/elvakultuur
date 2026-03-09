@@ -102,8 +102,8 @@
         }
 
         .list-thumb {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             border-radius: 10px;
             object-fit: cover;
             background-color: #0d1117;
@@ -137,9 +137,9 @@
             position: absolute;
             inset: 0;
             z-index: 1;
-            filter: blur(60px) brightness(0.2);
+            filter: blur(50px) brightness(0.25);
             object-fit: cover;
-            transform: scale(1.2);
+            transform: scale(1.15);
             width: 100%; height: 100%;
         }
 
@@ -154,8 +154,8 @@
         }
 
         .feat-poster-main img {
-            max-width: 95%;
-            max-height: 90%;
+            max-width: 92%;
+            max-height: 85%;
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 0 60px rgba(0,0,0,1);
@@ -210,7 +210,7 @@
         <div class="clock" id="clock">00:00</div>
     </header>
 
-    <div id="loader" class="status-msg">Ühendumine sündmuste vooga...</div>
+    <div id="loader" class="status-msg">Laen sündmusi...</div>
 
     <div class="layout" id="main-ui" style="display: none;">
         <div class="sidebar">
@@ -226,8 +226,9 @@
     </div>
 
     <script>
-        // SINU GOOGLE SCRIPT URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
+        // Kasutame lihtsamat URL-i ilma liigsete filtriteta, et tagada andmete kättesaadavus
+        const SOURCE_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788";
+        const BASE_URL = "https://kultuuriaken.tartu.ee";
         
         let allEvents = [];
         let activeIdx = -1;
@@ -235,7 +236,7 @@
         let scrollY = 0;
         let lastTs = 0;
 
-        const PLACEHOLDER_IMG = "https://dummyimage.com/1200x800/161b22/58a6ff.png&text=Kultuurisündmus";
+        const PLACEHOLDER_IMG = "https://dummyimage.com/1200x800/161b22/58a6ff.png&text=Kultuuris%C3%BCndmus";
 
         function updateClock() {
             document.getElementById('clock').innerText = new Date().toLocaleTimeString('et-EE', {hour: '2-digit', minute:'2-digit'});
@@ -250,14 +251,14 @@
                 const item = document.createElement('div');
                 item.className = 'list-item';
                 item.id = `ev-${i}`;
-                const thumb = ev.img || ev.image || ev.plakat || "https://dummyimage.com/150x150/161b22/58a6ff.png&text=+";
+                const thumb = ev.img || "https://dummyimage.com/150x150/161b22/58a6ff.png&text=+";
                 
                 item.innerHTML = `
                     <img src="${thumb}" class="list-thumb" onerror="this.src='https://dummyimage.com/150x150/161b22/58a6ff.png&text=+'">
                     <div class="list-text-content">
-                        <div class="list-date">${ev.date || ev.kuupaev || 'Kuupäev puudub'}</div>
-                        <div class="list-title">${ev.title || ev.nimi || 'Pealkiri'}</div>
-                        <div class="list-loc">📍 ${ev.loc || ev.koht || 'Elva vald'}</div>
+                        <div class="list-date">${ev.date}</div>
+                        <div class="list-title">${ev.title}</div>
+                        <div class="list-loc">📍 ${ev.loc}</div>
                     </div>
                 `;
                 list.appendChild(item);
@@ -270,14 +271,15 @@
             const ev = allEvents[idx];
             
             document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`ev-${idx}`)?.classList.add('active');
+            const listEl = document.getElementById(`ev-${idx}`);
+            if (listEl) listEl.classList.add('active');
 
             const inner = document.getElementById('featured-inner');
             inner.style.opacity = 0;
 
             setTimeout(() => {
-                const poster = ev.img || ev.image || ev.plakat || PLACEHOLDER_IMG;
-                const target = ev.url || ev.link || "https://elvakultuur.ee";
+                const poster = ev.img || PLACEHOLDER_IMG;
+                const target = ev.url || BASE_URL;
 
                 inner.innerHTML = `
                     <img src="${poster}" class="feat-bg-blur" onerror="this.src='${PLACEHOLDER_IMG}'">
@@ -287,10 +289,10 @@
                     <div class="feat-overlay">
                         <div class="feat-content">
                             <div class="feat-text-wrap">
-                                <div class="feat-date">${ev.date || ev.kuupaev || 'Täpsustamisel'}</div>
-                                <h2 class="feat-title">${ev.title || ev.nimi || ''}</h2>
-                                <div class="feat-loc">📍 ${ev.loc || ev.koht || 'Elva vald'}</div>
-                                <div class="feat-desc">${ev.desc || ev.kirjeldus || 'Vaata lisainfot QR-koodist.'}</div>
+                                <div class="feat-date">${ev.date}</div>
+                                <h2 class="feat-title">${ev.title}</h2>
+                                <div class="feat-loc">📍 ${ev.loc}</div>
+                                <div class="feat-desc">${ev.desc || 'Vaata lisainfot QR-koodist.'}</div>
                             </div>
                             <div class="qr-card">
                                 <div class="qr-label">INFO JA<br>PILETID</div>
@@ -301,53 +303,112 @@
                 `;
                 
                 const qrelement = document.getElementById('qr-box');
-                qrelement.innerHTML = "";
-                new QRCode(qrelement, {
-                    text: target, width: 120, height: 120, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M
-                });
+                if (qrelement) {
+                    qrelement.innerHTML = "";
+                    new QRCode(qrelement, {
+                        text: target, width: 120, height: 120, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
 
                 inner.style.opacity = 1;
             }, 250);
         }
 
-        // Nutikas laadija, mis proovib mitut proxy teenust
-        async function fetchEventsRobustly() {
-            const encodedUrl = encodeURIComponent(SCRIPT_URL);
+        async function fetchHtml() {
+            const encoded = encodeURIComponent(SOURCE_URL);
+            // Proovime erinevaid proxy teenuseid
             const proxies = [
-                `https://api.allorigins.win/get?url=${encodedUrl}`,
-                `https://corsproxy.io/?${encodedUrl}`,
-                `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`
+                `https://api.allorigins.win/get?url=${encoded}`,
+                `https://corsproxy.io/?${encoded}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encoded}`
             ];
 
-            for (const proxyUrl of proxies) {
+            for (const p of proxies) {
                 try {
-                    console.log("Proovin laadida läbi: " + proxyUrl);
-                    const res = await fetch(proxyUrl);
+                    const res = await fetch(p);
                     if (!res.ok) continue;
-
-                    let data;
-                    if (proxyUrl.includes('allorigins')) {
+                    if (p.includes('allorigins')) {
                         const json = await res.json();
-                        data = JSON.parse(json.contents);
+                        if (json.contents) return json.contents;
                     } else {
-                        data = await res.json();
-                    }
-
-                    if (data) {
-                        const results = Array.isArray(data) ? data : (data.events || data.data || []);
-                        if (results.length > 0) return results;
+                        const text = await res.text();
+                        if (text && text.length > 500) return text;
                     }
                 } catch (e) {
-                    console.warn("Proxy ebaõnnestus: " + proxyUrl);
+                    console.warn(`Proxy fail: ${p}`);
                 }
             }
-            throw new Error("Ükski proxy teenus ei suutnud andmeid laadida.");
+            throw new Error("Andmete laadimine ebaõnnestus.");
+        }
+
+        function parse(html) {
+            const doc = new DOMParser().parseFromString(html, "text/html");
+            // Leiame kõik elemendid, mis näevad välja nagu sündmuse artiklid
+            const nodes = Array.from(doc.querySelectorAll('.views-row, article, .node--type-syndmus, .event-item, .card, .grid-item'));
+            
+            const events = nodes.map(n => {
+                const link = n.querySelector('a[href*="/syndmus/"]');
+                if (!link) return null;
+
+                const title = link.textContent.trim();
+                if (title.length < 3) return null;
+
+                let url = link.getAttribute('href');
+                if (url.startsWith('/')) url = BASE_URL + url;
+
+                // Pildituvastus
+                let img = '';
+                const imgEl = n.querySelector('img');
+                if (imgEl) {
+                    img = imgEl.getAttribute('srcset')?.split(',')[0].trim().split(' ')[0] || 
+                          imgEl.getAttribute('data-src') || 
+                          imgEl.getAttribute('src') || '';
+                    if (img.startsWith('/')) img = BASE_URL + img;
+                    if (img.includes('.svg') || img.length < 15) img = '';
+                }
+
+                // Kuupäev
+                const dateEl = n.querySelector('.node__event-date, time, [class*="date"]');
+                let date = dateEl ? dateEl.textContent.trim().replace(/\s+/g, ' ') : '';
+                if (!date) {
+                    const match = n.innerText.match(/\d{1,2}\.\s*[a-zA-ZäöüõÄÖÜÕ]+/);
+                    date = match ? match[0] : 'Kuupäev täpsustamisel';
+                }
+
+                // Asukoht
+                const locEl = n.querySelector('[class*="place"], [class*="location"], [class*="venue"]');
+                const loc = locEl ? locEl.textContent.trim() : 'Elva vald';
+
+                // Kirjeldus
+                const descEl = n.querySelector('.node__body, .description, p');
+                const desc = descEl ? descEl.textContent.trim().substring(0, 160) + '...' : '';
+
+                return { title, date, loc, desc, img, url };
+            }).filter(ev => ev && ev.title);
+
+            // Kui midagi ei leitud, proovime veelgi vabamalt otsida kõiki linke
+            if (events.length === 0) {
+                const allLinks = Array.from(doc.querySelectorAll('a[href*="/syndmus/"]'));
+                const seen = new Set();
+                return allLinks.map(a => {
+                    const title = a.textContent.trim();
+                    const url = a.getAttribute('href').startsWith('/') ? BASE_URL + a.getAttribute('href') : a.getAttribute('href');
+                    if (title.length > 5 && !seen.has(url)) {
+                        seen.add(url);
+                        return { title, date: 'Vaata lähemalt', loc: 'Elva vald', desc: '', img: '', url };
+                    }
+                    return null;
+                }).filter(x => x !== null);
+            }
+
+            return events;
         }
 
         async function init() {
             const loader = document.getElementById('loader');
             try {
-                allEvents = await fetchEventsRobustly();
+                const html = await fetchHtml();
+                allEvents = parse(html);
 
                 if (allEvents.length > 0) {
                     loader.style.display = 'none';
@@ -356,11 +417,11 @@
                     switchFeatured(0);
                     requestAnimationFrame(animateScroll);
                 } else {
-                    loader.innerText = "Sündmusi ei leitud. Kontrolli Google Scripti väljundit.";
+                    loader.innerHTML = "Hetkel sündmusi ei leitud.<br><small style='font-size:1rem; opacity:0.6'>Kontrolli Tartu Kultuuriakna lehte või proovi hiljem uuesti.</small>";
                 }
             } catch (e) {
                 console.error(e);
-                loader.innerHTML = `<span style="color:#ff6b6b">Viga andmete laadimisel.</span><br><small style="font-size:1rem; opacity:0.6">${e.message}</small>`;
+                loader.innerHTML = `<span style="color:#ff6b6b">Viga andmete pärimisel.</span><br><small style="font-size:1rem; opacity:0.6">${e.message}</small>`;
             }
         }
 
@@ -373,7 +434,7 @@
             const dt = (ts - lastTs) / 1000;
             lastTs = ts;
 
-            scrollY += 25 * dt; // Kerimiskiirus
+            scrollY += 25 * dt;
             container.scrollTop = scrollY;
 
             const mid = container.scrollTop + (container.clientHeight / 2);
@@ -382,7 +443,8 @@
             let bestDist = Infinity;
 
             items.forEach((it, i) => {
-                const dist = Math.abs((it.offsetTop + it.offsetHeight / 2) - mid);
+                const center = it.offsetTop + it.offsetHeight / 2;
+                const dist = Math.abs(center - mid);
                 if (dist < bestDist) { bestDist = dist; bestIdx = i; }
             });
 
@@ -395,7 +457,7 @@
                     scrollY = 0;
                     lastTs = 0;
                     setTimeout(() => { isScrolling = true; requestAnimationFrame(animateScroll); }, 2000);
-                }, 3000);
+                }, 3500);
                 return;
             }
             requestAnimationFrame(animateScroll);
