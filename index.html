@@ -18,9 +18,7 @@
             --border-color: #30363d;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
@@ -255,7 +253,7 @@
             opacity: 0.85;
             color: #c9d1d9;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -306,376 +304,382 @@
 </head>
 <body>
 
-    <header>
-        <h1>Elva Valla Kultuur</h1>
-        <div class="clock" id="clock">00:00</div>
-    </header>
+<header>
+    <h1>Elva Valla Kultuur</h1>
+    <div class="clock" id="clock">00:00</div>
+</header>
 
-    <div id="loader" class="status-msg">Ühendumine sündmuste vooga...</div>
+<div id="loader" class="status-msg">Laen Kultuuriakna sündmusi...</div>
 
-    <div class="layout" id="main-ui" style="display: none;">
-        <div class="sidebar">
-            <div class="sidebar-header">Selle kuu tulevased sündmused</div>
-            <div class="scroll-container" id="scroll-container">
-                <div class="scroll-content" id="scroll-list"></div>
-            </div>
-        </div>
-
-        <div class="featured">
-            <div id="featured-inner"></div>
+<div class="layout" id="main-ui" style="display:none;">
+    <div class="sidebar">
+        <div class="sidebar-header">Selle kuu tulevased sündmused</div>
+        <div class="scroll-container" id="scroll-container">
+            <div class="scroll-content" id="scroll-list"></div>
         </div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
-        const DEFAULT_TARGET_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788";
-        const SCROLL_SPEED = 25;
+    <div class="featured">
+        <div id="featured-inner"></div>
+    </div>
+</div>
 
-        let allEvents = [];
-        let activeIdx = -1;
-        let isScrolling = true;
-        let scrollY = 0;
-        let lastTs = 0;
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
+    const DEFAULT_TARGET_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788";
+    const SCROLL_SPEED = 25;
 
-        const PLACEHOLDER_IMG =
-            "data:image/svg+xml;charset=UTF-8," +
-            encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
-                    <rect width="100%" height="100%" fill="#161b22"/>
-                    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-                          fill="#58a6ff" font-family="Arial, sans-serif"
-                          font-size="56" font-weight="700">
-                        Kultuurisündmus
-                    </text>
-                </svg>
-            `);
+    let allEvents = [];
+    let activeIdx = -1;
+    let isScrolling = true;
+    let scrollY = 0;
+    let lastTs = 0;
 
-        function escapeHtml(value) {
-            return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
+    const PLACEHOLDER_IMG =
+        "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+                <rect width="100%" height="100%" fill="#161b22"/>
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+                      fill="#58a6ff" font-family="Arial, sans-serif"
+                      font-size="56" font-weight="700">
+                    Kultuurisündmus
+                </text>
+            </svg>
+        `);
+
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function normalizeText(value) {
+        return String(value ?? "").replace(/\s+/g, " ").trim();
+    }
+
+    function truncate(text, max = 180) {
+        const clean = normalizeText(text);
+        if (!clean) return "";
+        return clean.length > max ? clean.slice(0, max).trim() + "..." : clean;
+    }
+
+    function normalizeUrl(url) {
+        const value = normalizeText(url);
+        if (!value) return "";
+        if (/^https?:\/\//i.test(value)) return value;
+        if (value.startsWith("//")) return "https:" + value;
+        if (value.startsWith("/")) return "https://kultuuriaken.tartu.ee" + value;
+        return value;
+    }
+
+    function safeJsonParse(input) {
+        if (input == null) return null;
+        if (typeof input === "object") return input;
+
+        const text = String(input).trim();
+        if (!text) return null;
+
+        try {
+            return JSON.parse(text);
+        } catch (err) {
+            return null;
         }
+    }
 
-        function normalizeText(value) {
-            return String(value ?? "").replace(/\s+/g, " ").trim();
+    function extractEventsArray(data) {
+        if (Array.isArray(data)) return data;
+        if (Array.isArray(data?.events)) return data.events;
+        if (Array.isArray(data?.data)) return data.data;
+        if (Array.isArray(data?.items)) return data.items;
+        if (Array.isArray(data?.results)) return data.results;
+        return [];
+    }
+
+    function normalizeEvent(raw) {
+        if (!raw || typeof raw !== "object") return null;
+
+        const title = normalizeText(raw.title);
+        if (!title) return null;
+
+        const date = normalizeText(raw.date || "Täpsustamisel");
+        const loc = normalizeText(raw.loc || "Elva vald");
+        const desc = truncate(raw.desc || "");
+        const img = normalizeUrl(raw.img || "");
+        const url = normalizeUrl(raw.url || DEFAULT_TARGET_URL);
+        const startIso = normalizeText(raw.startIso || "");
+
+        return { title, date, loc, desc, img, url, startIso };
+    }
+
+    async function fetchWithTimeout(url, timeout = 12000) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+
+        try {
+            return await fetch(url, {
+                method: "GET",
+                cache: "no-store",
+                signal: controller.signal
+            });
+        } finally {
+            clearTimeout(timer);
         }
+    }
 
-        function truncate(text, max = 180) {
-            const clean = normalizeText(text);
-            if (!clean) return "";
-            return clean.length > max ? clean.slice(0, max).trim() + "..." : clean;
-        }
-
-        function normalizeUrl(url) {
-            const value = normalizeText(url);
-            if (!value) return "";
-            if (/^https?:\/\//i.test(value)) return value;
-            if (value.startsWith("//")) return "https:" + value;
-            if (value.startsWith("/")) return "https://kultuuriaken.tartu.ee" + value;
-            return value;
-        }
-
-        function safeJsonParse(input) {
-            if (input == null) return null;
-            if (typeof input === "object") return input;
-
-            const text = String(input).trim();
-            if (!text) return null;
-
-            try {
-                return JSON.parse(text);
-            } catch (err) {
-                return null;
-            }
-        }
-
-        function extractEventsArray(data) {
-            if (Array.isArray(data)) return data;
-            if (Array.isArray(data?.events)) return data.events;
-            if (Array.isArray(data?.data)) return data.data;
-            if (Array.isArray(data?.items)) return data.items;
-            if (Array.isArray(data?.results)) return data.results;
-            return [];
-        }
-
-        function normalizeEvent(raw) {
-            if (!raw || typeof raw !== "object") return null;
-
-            const title = normalizeText(raw.title || raw.nimi || raw.name || raw.pealkiri);
-            if (!title) return null;
-
-            const date = normalizeText(raw.date || raw.kuupaev || raw.kp || raw.aeg || raw.datetime || "Täpsustamisel");
-            const loc = normalizeText(raw.loc || raw.koht || raw.location || raw.place || "Elva vald");
-            const desc = truncate(raw.desc || raw.kirjeldus || raw.description || raw.sisu || "");
-            const img = normalizeUrl(raw.img || raw.image || raw.plakat || raw.poster || raw.photo || "");
-            const url = normalizeUrl(raw.url || raw.link || raw.href || raw.eventUrl || DEFAULT_TARGET_URL);
-
-            return { title, date, loc, desc, img, url };
-        }
-
-        async function fetchWithTimeout(url, timeout = 12000) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), timeout);
-
-            try {
-                return await fetch(url, {
-                    method: "GET",
-                    cache: "no-store",
-                    signal: controller.signal
-                });
-            } finally {
-                clearTimeout(timer);
-            }
-        }
-
-        async function parseAttemptResponse(type, response) {
-            if (type === "direct-json") {
-                const text = await response.text();
-                return safeJsonParse(text);
-            }
-
-            if (type === "allorigins") {
-                const wrapper = await response.json();
-                return safeJsonParse(wrapper?.contents);
-            }
-
+    async function parseAttemptResponse(type, response) {
+        if (type === "direct-json") {
             const text = await response.text();
             return safeJsonParse(text);
         }
 
-        async function fetchEventsRobustly() {
-            const encodedUrl = encodeURIComponent(SCRIPT_URL);
+        if (type === "allorigins") {
+            const wrapper = await response.json();
+            return safeJsonParse(wrapper?.contents);
+        }
 
-            const attempts = [
-                { type: "direct-json", url: SCRIPT_URL },
-                { type: "allorigins", url: `https://api.allorigins.win/get?url=${encodedUrl}` },
-                { type: "plain-text", url: `https://corsproxy.io/?${encodedUrl}` },
-                { type: "plain-text", url: `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}` }
-            ];
+        const text = await response.text();
+        return safeJsonParse(text);
+    }
 
-            for (const attempt of attempts) {
-                try {
-                    const res = await fetchWithTimeout(attempt.url, 12000);
-                    if (!res.ok) continue;
+    async function fetchEventsRobustly() {
+        const encodedUrl = encodeURIComponent(SCRIPT_URL);
 
-                    const parsed = await parseAttemptResponse(attempt.type, res);
-                    const events = extractEventsArray(parsed)
-                        .map(normalizeEvent)
-                        .filter(Boolean);
+        const attempts = [
+            { type: "direct-json", url: SCRIPT_URL },
+            { type: "allorigins", url: `https://api.allorigins.win/get?url=${encodedUrl}` },
+            { type: "plain-text", url: `https://corsproxy.io/?${encodedUrl}` },
+            { type: "plain-text", url: `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}` }
+        ];
 
-                    if (events.length > 0) {
-                        return events;
-                    }
-                } catch (err) {
+        for (const attempt of attempts) {
+            try {
+                const res = await fetchWithTimeout(attempt.url, 12000);
+                if (!res.ok) continue;
+
+                const parsed = await parseAttemptResponse(attempt.type, res);
+                const events = extractEventsArray(parsed)
+                    .map(normalizeEvent)
+                    .filter(Boolean)
+                    .sort((a, b) => {
+                        if (!a.startIso || !b.startIso) return 0;
+                        return new Date(a.startIso) - new Date(b.startIso);
+                    });
+
+                if (events.length > 0) {
+                    return events;
                 }
+            } catch (err) {
             }
-
-            throw new Error("Ükski andmeallikas ei vastanud sobiva JSON-iga.");
         }
 
-        function updateClock() {
-            document.getElementById("clock").textContent = new Date().toLocaleTimeString("et-EE", {
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
+        throw new Error("Ükski andmeallikas ei vastanud sobiva JSON-iga.");
+    }
 
-        setInterval(updateClock, 1000);
-        updateClock();
+    function updateClock() {
+        document.getElementById("clock").textContent = new Date().toLocaleTimeString("et-EE", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
 
-        function createImageElement(src, className, altText = "") {
-            const img = document.createElement("img");
-            img.className = className;
-            img.alt = altText;
-            img.src = src || PLACEHOLDER_IMG;
-            img.onerror = function () {
-                this.onerror = null;
-                this.src = PLACEHOLDER_IMG;
-            };
-            return img;
-        }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-        function renderList() {
-            const list = document.getElementById("scroll-list");
-            list.innerHTML = "";
+    function createImageElement(src, className, altText = "") {
+        const img = document.createElement("img");
+        img.className = className;
+        img.alt = altText;
+        img.src = src || PLACEHOLDER_IMG;
+        img.onerror = function () {
+            this.onerror = null;
+            this.src = PLACEHOLDER_IMG;
+        };
+        return img;
+    }
 
-            allEvents.forEach((ev, i) => {
-                const item = document.createElement("div");
-                item.className = "list-item";
-                item.id = `ev-${i}`;
+    function renderList() {
+        const list = document.getElementById("scroll-list");
+        list.innerHTML = "";
 
-                const thumb = createImageElement(ev.img, "list-thumb", ev.title);
+        allEvents.forEach((ev, i) => {
+            const item = document.createElement("div");
+            item.className = "list-item";
+            item.id = `ev-${i}`;
 
-                const textWrap = document.createElement("div");
-                textWrap.className = "list-text-content";
+            const thumb = createImageElement(ev.img, "list-thumb", ev.title);
 
-                const date = document.createElement("div");
-                date.className = "list-date";
-                date.textContent = ev.date || "Kuupäev puudub";
+            const textWrap = document.createElement("div");
+            textWrap.className = "list-text-content";
 
-                const title = document.createElement("div");
-                title.className = "list-title";
-                title.textContent = ev.title || "Pealkiri";
+            const date = document.createElement("div");
+            date.className = "list-date";
+            date.textContent = ev.date || "Kuupäev puudub";
 
-                const loc = document.createElement("div");
-                loc.className = "list-loc";
-                loc.textContent = "📍 " + (ev.loc || "Elva vald");
+            const title = document.createElement("div");
+            title.className = "list-title";
+            title.textContent = ev.title || "Pealkiri";
 
-                textWrap.appendChild(date);
-                textWrap.appendChild(title);
-                textWrap.appendChild(loc);
+            const loc = document.createElement("div");
+            loc.className = "list-loc";
+            loc.textContent = "📍 " + (ev.loc || "Elva vald");
 
-                item.appendChild(thumb);
-                item.appendChild(textWrap);
-                list.appendChild(item);
-            });
-        }
+            textWrap.appendChild(date);
+            textWrap.appendChild(title);
+            textWrap.appendChild(loc);
 
-        function switchFeatured(idx) {
-            if (idx === activeIdx || !allEvents[idx]) return;
+            item.appendChild(thumb);
+            item.appendChild(textWrap);
+            list.appendChild(item);
+        });
+    }
 
-            activeIdx = idx;
-            const ev = allEvents[idx];
+    function switchFeatured(idx) {
+        if (idx === activeIdx || !allEvents[idx]) return;
 
-            document.querySelectorAll(".list-item").forEach(el => el.classList.remove("active"));
-            document.getElementById(`ev-${idx}`)?.classList.add("active");
+        activeIdx = idx;
+        const ev = allEvents[idx];
 
-            const inner = document.getElementById("featured-inner");
-            inner.style.opacity = 0;
+        document.querySelectorAll(".list-item").forEach(el => el.classList.remove("active"));
+        document.getElementById(`ev-${idx}`)?.classList.add("active");
 
-            setTimeout(() => {
-                const poster = escapeHtml(ev.img || PLACEHOLDER_IMG);
-                const target = ev.url || DEFAULT_TARGET_URL;
+        const inner = document.getElementById("featured-inner");
+        inner.style.opacity = 0;
 
-                inner.innerHTML = `
-                    <img src="${poster}" class="feat-bg-blur" alt="">
-                    <div class="feat-poster-main">
-                        <img src="${poster}" alt="${escapeHtml(ev.title)}">
-                    </div>
-                    <div class="feat-overlay">
-                        <div class="feat-content">
-                            <div class="feat-text-wrap">
-                                <div class="feat-date">${escapeHtml(ev.date || "Täpsustamisel")}</div>
-                                <h2 class="feat-title">${escapeHtml(ev.title || "")}</h2>
-                                <div class="feat-loc">📍 ${escapeHtml(ev.loc || "Elva vald")}</div>
-                                <div class="feat-desc">${escapeHtml(ev.desc || "Vaata lisainfot QR-koodist.")}</div>
-                            </div>
-                            <div class="qr-card">
-                                <div class="qr-label">INFO JA<br>PILETID</div>
-                                <div class="qr-target" id="qr-box"></div>
-                            </div>
+        setTimeout(() => {
+            const poster = escapeHtml(ev.img || PLACEHOLDER_IMG);
+            const target = ev.url || DEFAULT_TARGET_URL;
+
+            inner.innerHTML = `
+                <img src="${poster}" class="feat-bg-blur" alt="">
+                <div class="feat-poster-main">
+                    <img src="${poster}" alt="${escapeHtml(ev.title)}">
+                </div>
+                <div class="feat-overlay">
+                    <div class="feat-content">
+                        <div class="feat-text-wrap">
+                            <div class="feat-date">${escapeHtml(ev.date || "Täpsustamisel")}</div>
+                            <h2 class="feat-title">${escapeHtml(ev.title || "")}</h2>
+                            <div class="feat-loc">📍 ${escapeHtml(ev.loc || "Elva vald")}</div>
+                            <div class="feat-desc">${escapeHtml(ev.desc || "Vaata lisainfot QR-koodist.")}</div>
+                        </div>
+                        <div class="qr-card">
+                            <div class="qr-label">INFO JA<br>PILETID</div>
+                            <div class="qr-target" id="qr-box"></div>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
 
-                inner.querySelectorAll("img").forEach(img => {
-                    img.onerror = function () {
-                        this.onerror = null;
-                        this.src = PLACEHOLDER_IMG;
-                    };
-                });
-
-                const qrElement = document.getElementById("qr-box");
-                qrElement.innerHTML = "";
-
-                new QRCode(qrElement, {
-                    text: target,
-                    width: 120,
-                    height: 120,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.M
-                });
-
-                inner.style.opacity = 1;
-            }, 250);
-        }
-
-        function animateScroll(ts) {
-            if (!isScrolling) return;
-
-            const container = document.getElementById("scroll-container");
-            if (!container) return;
-
-            const items = document.querySelectorAll(".list-item");
-            if (!items.length) return;
-
-            if (container.scrollHeight <= container.clientHeight + 4) {
-                switchFeatured(0);
-                return;
-            }
-
-            if (!lastTs) lastTs = ts;
-            const dt = (ts - lastTs) / 1000;
-            lastTs = ts;
-
-            scrollY += SCROLL_SPEED * dt;
-            container.scrollTop = scrollY;
-
-            const mid = container.scrollTop + (container.clientHeight / 2);
-            let bestIdx = 0;
-            let bestDist = Infinity;
-
-            items.forEach((it, i) => {
-                const dist = Math.abs((it.offsetTop + it.offsetHeight / 2) - mid);
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    bestIdx = i;
-                }
+            inner.querySelectorAll("img").forEach(img => {
+                img.onerror = function () {
+                    this.onerror = null;
+                    this.src = PLACEHOLDER_IMG;
+                };
             });
 
-            switchFeatured(bestIdx);
+            const qrElement = document.getElementById("qr-box");
+            qrElement.innerHTML = "";
 
-            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
-                isScrolling = false;
+            new QRCode(qrElement, {
+                text: target,
+                width: 120,
+                height: 120,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            inner.style.opacity = 1;
+        }, 250);
+    }
+
+    function animateScroll(ts) {
+        if (!isScrolling) return;
+
+        const container = document.getElementById("scroll-container");
+        if (!container) return;
+
+        const items = document.querySelectorAll(".list-item");
+        if (!items.length) return;
+
+        if (container.scrollHeight <= container.clientHeight + 4) {
+            switchFeatured(0);
+            return;
+        }
+
+        if (!lastTs) lastTs = ts;
+        const dt = (ts - lastTs) / 1000;
+        lastTs = ts;
+
+        scrollY += SCROLL_SPEED * dt;
+        container.scrollTop = scrollY;
+
+        const mid = container.scrollTop + (container.clientHeight / 2);
+        let bestIdx = 0;
+        let bestDist = Infinity;
+
+        items.forEach((it, i) => {
+            const dist = Math.abs((it.offsetTop + it.offsetHeight / 2) - mid);
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestIdx = i;
+            }
+        });
+
+        switchFeatured(bestIdx);
+
+        if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
+            isScrolling = false;
+
+            setTimeout(() => {
+                container.scrollTo({ top: 0, behavior: "smooth" });
+                scrollY = 0;
+                lastTs = 0;
 
                 setTimeout(() => {
-                    container.scrollTo({ top: 0, behavior: "smooth" });
-                    scrollY = 0;
-                    lastTs = 0;
+                    isScrolling = true;
+                    requestAnimationFrame(animateScroll);
+                }, 2000);
+            }, 3000);
 
-                    setTimeout(() => {
-                        isScrolling = true;
-                        requestAnimationFrame(animateScroll);
-                    }, 2000);
-                }, 3000);
-
-                return;
-            }
-
-            requestAnimationFrame(animateScroll);
+            return;
         }
 
-        async function init() {
-            const loader = document.getElementById("loader");
-            const mainUi = document.getElementById("main-ui");
+        requestAnimationFrame(animateScroll);
+    }
 
-            try {
-                allEvents = await fetchEventsRobustly();
+    async function init() {
+        const loader = document.getElementById("loader");
+        const mainUi = document.getElementById("main-ui");
 
-                if (allEvents.length > 0) {
-                    loader.style.display = "none";
-                    mainUi.style.display = "flex";
-                    renderList();
-                    switchFeatured(0);
+        try {
+            allEvents = await fetchEventsRobustly();
 
-                    if (allEvents.length > 1) {
-                        requestAnimationFrame(animateScroll);
-                    }
-                } else {
-                    loader.textContent = "Selle kuu tulevasi sündmusi ei leitud.";
+            if (allEvents.length > 0) {
+                loader.style.display = "none";
+                mainUi.style.display = "flex";
+                renderList();
+                switchFeatured(0);
+
+                if (allEvents.length > 1) {
+                    requestAnimationFrame(animateScroll);
                 }
-            } catch (e) {
-                console.error(e);
-                loader.innerHTML = `<span style="color:#ff6b6b">Viga andmete laadimisel.</span><br><small style="font-size:1rem; opacity:0.6">${escapeHtml(e.message)}</small>`;
+            } else {
+                loader.textContent = "Selle kuu tulevasi sündmusi ei leitud.";
             }
+        } catch (e) {
+            console.error(e);
+            loader.innerHTML = `<span style="color:#ff6b6b">Viga andmete laadimisel.</span><br><small style="font-size:1rem; opacity:0.6">${escapeHtml(e.message)}</small>`;
         }
+    }
 
-        init();
-        setInterval(() => window.location.reload(), 30 * 60 * 1000);
-    </script>
+    init();
+    setInterval(() => window.location.reload(), 30 * 60 * 1000);
+</script>
+
 </body>
 </html>
