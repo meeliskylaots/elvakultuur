@@ -240,7 +240,7 @@
             line-height: 1.1;
             color: #ffffff;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 6;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -364,7 +364,7 @@
         return String(value ?? "").replace(/\s+/g, " ").trim();
     }
 
-    function truncate(text, max = 180) {
+    function truncate(text, max = 420) {
         const clean = normalizeText(text);
         if (!clean) return "";
         return clean.length > max ? clean.slice(0, max).trim() + "..." : clean;
