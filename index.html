@@ -62,7 +62,7 @@
             background: var(--card-bg);
             border-radius: 20px;
             border: 1px solid var(--border-color);
-            overflow: hidden; /* Peidab kasti seest välja mineva sisu */
+            overflow: hidden;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             display: flex;
@@ -83,7 +83,7 @@
 
         .scroll-container {
             flex: 1;
-            overflow-y: hidden; /* Kerime seda JS-iga */
+            overflow-y: hidden; 
             position: relative;
         }
 
@@ -96,7 +96,7 @@
 
         .list-item {
             background: rgba(255,255,255,0.03);
-            padding: 15px 20px;
+            padding: 20px 20px; /* Tegin kaste veidi kõrgemaks */
             border-radius: 12px;
             border-left: 5px solid transparent;
             transition: all 0.3s ease;
@@ -108,13 +108,14 @@
         .list-item.active {
             background: rgba(88, 166, 255, 0.1);
             border-left-color: var(--accent);
+            transform: scale(1.02); /* Fookuses olev kastike hüppab kergelt esile */
         }
 
         .list-date { font-size: 1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; }
         .list-title { font-size: 1.3rem; font-weight: 700; color: #fff; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .list-loc { font-size: 0.9rem; color: var(--text-muted); }
 
-        /* PAREM PANEEL (Suur detailvaade) */
+        /* PAREM PANEEL (Kino-stiilis täisekraan poster) */
         .featured {
             width: 65%;
             background: var(--card-bg);
@@ -123,49 +124,75 @@
             display: flex;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            transition: opacity 0.4s ease; /* Sujuv vahetus */
+            transition: opacity 0.4s ease;
+            position: relative; /* Vajalik absolute positsioneerimiseks */
         }
         
         .feat-poster {
-            width: 45%;
-            background: #0d1117;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-color: #0d1117;
         }
         
         .feat-poster img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
+            object-position: center top;
+            opacity: 0.6; /* Teeb pildi kergelt tumedamaks, et tekst oleks loetav */
+        }
+
+        /* Tume hajutatud gradient alt üles, tagab teksti loetavuse */
+        .feat-poster::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, rgba(13,17,23,1) 0%, rgba(13,17,23,0.8) 35%, rgba(13,17,23,0) 100%);
         }
         
         .feat-info {
-            width: 55%;
-            padding: 50px 40px;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            padding: 50px;
             display: flex;
             flex-direction: column;
-            position: relative;
+            justify-content: flex-end; /* Lükkab sisu alla serva */
             box-sizing: border-box;
         }
-        
-        .feat-date { color: var(--accent); font-size: 2rem; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; }
-        .feat-title { font-size: 3.5rem; margin: 0 0 20px 0; font-weight: 900; line-height: 1.1; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .feat-loc { font-size: 1.8rem; color: var(--text-muted); margin-bottom: 30px; display: flex; align-items: center; font-weight: 600; }
-        .feat-desc { font-size: 1.5rem; line-height: 1.6; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
-        
-        /* QR koodi sektsioon asub nüüd kasti allosas */
-        .qr-section {
-            margin-top: auto; /* Lükkab QR sektsiooni kasti põhja */
+
+        .feat-content-wrapper {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            background: #21262d;
+            align-items: flex-end;
+            gap: 40px;
+        }
+        
+        .feat-text {
+            flex: 1;
+        }
+
+        .feat-date { color: var(--accent); font-size: 2rem; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .feat-title { font-size: 3.5rem; margin: 0 0 20px 0; font-weight: 900; line-height: 1.1; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 2px 15px rgba(0,0,0,0.9); }
+        .feat-loc { font-size: 1.8rem; color: #e6edf3; margin-bottom: 20px; display: flex; align-items: center; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .feat-desc { font-size: 1.5rem; line-height: 1.6; opacity: 0.95; color: #c9d1d9; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        
+        .qr-section {
+            background: rgba(33, 38, 45, 0.85); /* Poolläbipaistev taust */
+            backdrop-filter: blur(10px);
             padding: 20px;
             border-radius: 15px;
             border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
         
         .qr-text-box { display: flex; flex-direction: column; gap: 5px; }
@@ -175,8 +202,7 @@
 
         .status-message { font-size: 2rem; text-align: center; margin-top: 20vh; color: var(--text-muted); width: 100%; }
         
-        /* Peidame featured kasti sisu algselt, kui andmeid veel pole */
-        #featured-content { width: 100%; display: flex; opacity: 0; transition: opacity 0.5s ease;}
+        #featured-content { width: 100%; height: 100%; display: flex; opacity: 0; transition: opacity 0.5s ease;}
     </style>
 </head>
 <body>
@@ -212,7 +238,6 @@
         
         let globalEvents = [];
         let currentFeaturedIndex = 0;
-        let featuredInterval;
 
         async function fetchWithProxy(url) {
             const encodedUrl = encodeURIComponent(url);
@@ -240,7 +265,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Kuvab kõik leitud sündmused vasakule paneelile
         function renderSidebar() {
             const scrollContent = document.getElementById('scroll-content');
             scrollContent.innerHTML = ''; 
@@ -261,7 +285,6 @@
             });
         }
 
-        // Vahetab paremal asuvat suurt pilti ja infot
         function updateFeaturedEvent() {
             const event = globalEvents[currentFeaturedIndex];
             if (!event) return;
@@ -273,15 +296,13 @@
 
             const contentEl = document.getElementById('featured-content');
             
-            // Sujuv kadumine
             contentEl.style.opacity = 0;
             
             setTimeout(() => {
-                const fallbackImg = 'https://via.placeholder.com/800x1200/161b22/58a6ff?text=Kultuuris%C3%BCndmus';
+                // Töökindlam varupilt
+                const fallbackImg = 'https://dummyimage.com/1200x800/161b22/58a6ff.png&text=Kultuuris%C3%BCndmus';
                 const imageUrl = event['Plakat (URL)'] && event['Plakat (URL)'].length > 5 ? event['Plakat (URL)'] : fallbackImg;
                 const timeString = event.Aeg ? ` kell ${event.Aeg}` : '';
-
-                // Kui sündmusel pole eraldi URLi leitud, suuname QR koodi Elva kultuuri pealehele
                 const qrTargetUrl = event.EventUrl || 'https://kultuuriaken.tartu.ee/et/syndmused?regions=788';
 
                 contentEl.innerHTML = `
@@ -289,22 +310,25 @@
                         <img src="${imageUrl}" alt="Plakat" onerror="this.onerror=null;this.src='${fallbackImg}';">
                     </div>
                     <div class="feat-info">
-                        <div class="feat-date">${event['Kuupäev']}${timeString}</div>
-                        <h2 class="feat-title">${event.Nimi}</h2>
-                        <div class="feat-loc">📍 ${event.Koht}</div>
-                        <div class="feat-desc">${event.Kirjeldus}</div>
-                        
-                        <div class="qr-section">
-                            <div class="qr-text-box">
-                                <span class="qr-title">Osta pilet ja vaata lisa</span>
-                                <span class="qr-subtitle">Skaneeri kood telefoniga 👉</span>
+                        <div class="feat-content-wrapper">
+                            <div class="feat-text">
+                                <div class="feat-date">${event['Kuupäev']}${timeString}</div>
+                                <h2 class="feat-title">${event.Nimi}</h2>
+                                <div class="feat-loc">📍 ${event.Koht}</div>
+                                <div class="feat-desc">${event.Kirjeldus}</div>
                             </div>
-                            <div class="qr-code" id="qr-featured"></div>
+                            
+                            <div class="qr-section">
+                                <div class="qr-text-box">
+                                    <span class="qr-title">Osta pilet / Lisa info</span>
+                                    <span class="qr-subtitle">Skaneeri kood telefoniga 👉</span>
+                                </div>
+                                <div class="qr-code" id="qr-featured"></div>
+                            </div>
                         </div>
                     </div>
                 `;
                 
-                // Genereerime uue QR koodi
                 setTimeout(() => {
                     new QRCode(document.getElementById(`qr-featured`), {
                         text: qrTargetUrl,
@@ -316,12 +340,10 @@
                     });
                 }, 50);
 
-                // Sujuv ilmumine
                 contentEl.style.opacity = 1;
-            }, 400); // Ootab 0.4s (sama mis CSS transition), siis vahetab sisu
+            }, 400); 
         }
 
-        // Seome parempoolse akna vasaku kerimisribaga
         function checkFeaturedItem() {
             const container = document.getElementById('scroll-container');
             if (!container) return;
@@ -329,8 +351,9 @@
             const items = document.querySelectorAll('.list-item');
             if (items.length === 0) return;
 
-            // Fookuse joon: umbes 30% kasti ülaosast (kui element jõuab siia, vahetub parem pilt)
-            const triggerY = container.scrollTop + (container.clientHeight * 0.3);
+            // UUS FOOKUS: Täpselt kasti keskkoht (0.5). 
+            // Sündmus püsib esiletõstetuna kogu aja, mis kulub tal kasti keskosa läbimiseks.
+            const triggerY = container.scrollTop + (container.clientHeight * 0.5);
 
             let newFeaturedIndex = currentFeaturedIndex;
             let minDistance = Infinity;
@@ -345,7 +368,6 @@
                 }
             });
 
-            // Kui fookusesse tuleb uus element, vaheta pilti
             if (newFeaturedIndex !== currentFeaturedIndex) {
                 currentFeaturedIndex = newFeaturedIndex;
                 updateFeaturedEvent();
@@ -388,7 +410,6 @@
 
                     if (!title) return null;
 
-                    // URLi kättesaamine QR koodi jaoks (viib sündmuse detaillehele)
                     let eventUrl = '';
                     if (titleNode && titleNode.tagName.toLowerCase() === 'a') {
                         eventUrl = titleNode.getAttribute('href');
@@ -444,7 +465,6 @@
                 }).filter(item => item !== null && item.Nimi.length > 0);
 
                 if (globalEvents.length > 0) {
-                    // Peidame laadimisteate ja näitame põhisisu
                     document.getElementById('status-container').style.display = 'none';
                     document.getElementById('main-layout').style.display = 'flex';
                     
@@ -462,7 +482,6 @@
             }
         }
 
-        // Vasaku paneeli sujuv pidev kerimine
         let scrollPos = 0;
         let isScrolling = false;
 
@@ -472,18 +491,16 @@
             const container = document.getElementById('scroll-container');
             if(!container) return;
 
-            scrollPos += 0.5; // Väga aeglane ja sujuv kerimiskiirus
+            scrollPos += 0.5; 
             container.scrollTop = scrollPos;
             
-            checkFeaturedItem(); // UUS: Kontrollime igal sammul, milline element on fookuses
+            checkFeaturedItem(); 
             
-            // Kui jõuame sisu lõppu, kerime sujuvalt algusesse tagasi
             if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
                 isScrolling = false; 
                 setTimeout(() => {
                     container.scrollTo({ top: 0, behavior: 'smooth' });
                     
-                    // Tagasikerimisel paneme kohe esimese elemendi uuesti fookusesse
                     currentFeaturedIndex = 0;
                     updateFeaturedEvent();
                     
@@ -508,13 +525,11 @@
             setTimeout(() => {
                 isScrolling = true;
                 requestAnimationFrame(scrollLoop);
-            }, 5000); // Ootab 5 sek enne kerimise algust
+            }, 5000); 
         }
 
-        // KÄIVITAMINE
         loadEvents();
         
-        // Täis-restart iga 30 minuti tagant andmete uuendamiseks
         setInterval(() => window.location.reload(), 30 * 60 * 1000);
 
     </script>
