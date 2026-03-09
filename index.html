@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elva Valla Kultuuriekraan</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --border-color: #30363d;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Peidab koleda kerimisriba teleris */
+        }
+        
+        header {
+            background-color: rgba(13, 17, 23, 0.98);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        h1 { 
+            margin: 0; 
+            font-weight: 900; 
+            font-size: 2.5rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: #ffffff;
+        }
+        
+        .clock { 
+            font-size: 2.5rem; 
+            font-weight: 700; 
+            color: var(--accent); 
+        }
+        
+        #container {
+            margin-top: 120px; /* Jätab ruumi päisele */
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding-bottom: 100vh; /* Jätab alla ruumi, et viimane kaart keriks üles */
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            display: flex;
+            height: 450px; /* Teleri jaoks optimeeritud kõrgus */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .poster {
+            width: 35%;
+            height: 100%;
+            background-color: #000;
+            flex-shrink: 0;
+        }
+        
+        .poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .info {
+            width: 65%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-sizing: border-box;
+        }
+        
+        .date-time { 
+            color: var(--accent); 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+            text-transform: uppercase;
+        }
+        
+        .title { 
+            font-size: 3.5rem; 
+            margin: 0 0 15px 0; 
+            font-weight: 900; 
+            line-height: 1.1; 
+            color: #ffffff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Piirab pika pealkirja 2 reaga */
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        
+        .location { 
+            font-size: 1.6rem; 
+            color: var(--text-muted); 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .description { 
+            font-size: 1.4rem; 
+            line-height: 1.6; 
+            opacity: 0.9; 
+            display: -webkit-box;
+            -webkit-line-clamp: 4; /* Piirab pika kirjelduse 4 reaga */
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            padding-right: 180px; /* Jätab ruumi QR koodile */
+        }
+        
+        .qr-section {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #21262d;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        .qr-text { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            color: white; 
+            text-align: right; 
+            line-height: 1.3;
+        }
+        
+        .qr-code { 
+            background: white; 
+            padding: 10px; 
+            border-radius: 10px; 
+        }
+
+        /* Error/Loading message */
+        .status-message {
+            font-size: 2rem;
+            text-align: center;
+            margin-top: 100px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Elva Valla Kultuur</h1>
+        <div class="clock" id="clock">00:00</div>
+    </header>
+
+    <div id="container">
+        <div class="status-message">Laen andmeid Kultuuriaknast...</div>
+    </div>
+
+    <script>
+        // Kultuuriakna URL (koos sinu valitud filtritega)
+        const KULTUURIAKEN_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788&categories=1%7C2%7C3%7C4%7C5%7C6%7C7%7C8%7C9%7C10%7C11%7C12%7C13%7C14%7C15%7C16%7C59%7C60%7C61%7C62%7C63%7C64%7C65%7C17%7C18%7C19%7C20%7C21%7C22%7C85%7C23%7C35%7C87%7C88%7C24&starting_time=5";
+        
+        // Mitu proxy't, juhuks kui üks peaks alt vedama või blokeeritakse
+        async function fetchWithProxy(url) {
+            const encodedUrl = encodeURIComponent(url);
+            const proxies = [
+                `https://api.allorigins.win/raw?url=${encodedUrl}`,
+                `https://corsproxy.io/?${encodedUrl}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`
+            ];
+
+            for (let proxy of proxies) {
+                try {
+                    const response = await fetch(proxy);
+                    if (response.ok) {
+                        return await response.text();
+                    }
+                } catch (e) {
+                    console.warn(`Proxy ${proxy} ebaõnnestus.`);
+                }
+            }
+            throw new Error("Kõik proxy-serverid ebaõnnestusid või on blokeeritud.");
+        }
+
+        // Kella loogika
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('et-EE', {hour: '2-digit', minute:'2-digit'});
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Andmete töötlemine ja kaartide loomine
+        function renderEvents(data) {
+            const container = document.getElementById('container');
+            container.innerHTML = ''; // Tühjendame eelmised
+
+            data.forEach((row, index) => {
+                // Kontrollime, et rida poleks tühi (kontrollime nime olemasolu)
+                if (!row.Nimi || row.Nimi.trim() === '') return; 
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // QR koodi HTML loogika
+                let qrHTML = '';
+                if (row.Piletilink && row.Piletilink.length > 5) {
+                    qrHTML = `
+                        <div class="qr-section">
+                            <div class="qr-text">Skaneeri ja<br><span style="color:var(--accent)">Osta Pilet!</span></div>
+                            <div class="qr-code" id="qr-${index}"></div>
+                        </div>
+                    `;
+                }
+
+                const imageUrl = row['Plakat (URL)'] && row['Plakat (URL)'].length > 5 
+                    ? row['Plakat (URL)'] 
+                    : 'https://via.placeholder.com/600x800/161b22/58a6ff?text=Kultuuris%C3%BCndmus';
+
+                // Vormindame aja kuvamise sõltuvalt sellest, kas meil on eraldi kellaaeg või on see juba kuupäeva sees
+                const timeString = row.Aeg ? ` kell ${row.Aeg}` : '';
+
+                card.innerHTML = `
+                    <div class="poster">
+                        <img src="${imageUrl}" alt="Plakat">
+                    </div>
+                    <div class="info">
+                        <div class="date-time">${row['Kuupäev']}${timeString}</div>
+                        <h2 class="title">${row.Nimi}</h2>
+                        <div class="location">📍 ${row.Koht}</div>
+                        <div class="description">${row.Kirjeldus || ''}</div>
+                        ${qrHTML}
+                    </div>
+                `;
+                container.appendChild(card);
+
+                // Genereerime QR koodi pildi, kui link on olemas
+                if (row.Piletilink && row.Piletilink.length > 5) {
+                    setTimeout(() => {
+                        new QRCode(document.getElementById(`qr-${index}`), {
+                            text: row.Piletilink,
+                            width: 110,
+                            height: 110,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    }, 50); // Väike viivitus tagab, et DOM on valmis
+                }
+            });
+
+            // Käivitame kerimise alles siis, kui andmed on laetud
+            startAutoScroll();
+        }
+
+        async function loadEvents() {
+            try {
+                // Näitame laadimisteate
+                document.getElementById('container').innerHTML = '<div class="status-message">Laen andmeid Kultuuriaknast...</div>';
+                
+                // Pärime HTML andmed kasutades proxy funktsiooni
+                const htmlText = await fetchWithProxy(KULTUURIAKEN_URL);
+                
+                // Parsime Kultuuriakna HTML koodi
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, "text/html");
+                
+                // Otsime sündmuste elemente (.views-row on Kultuuriaknas standardne sündmuse konteiner)
+                const rows = doc.querySelectorAll('.views-row');
+                
+                const parsedData = Array.from(rows).map(row => {
+                    // Pealkiri
+                    const titleNode = row.querySelector('.views-field-title a, .node__title a, h2 a, h3 a');
+                    const title = titleNode ? titleNode.innerText.trim() : '';
+
+                    if (!title) return null;
+
+                    // Pilt
+                    const imgNode = row.querySelector('img');
+                    let imgUrl = imgNode ? imgNode.getAttribute('src') : '';
+                    // Kui pildi link on suhteline (algab kaldkriipsuga), lisame domeeni
+                    if (imgUrl && imgUrl.startsWith('/')) {
+                        imgUrl = 'https://kultuuriaken.tartu.ee' + imgUrl;
+                    }
+
+                    // Kuupäev ja aeg (Kultuuriaknas on need HTML-is sageli samas lahtris)
+                    const dateNode = row.querySelector('.views-field-field-event-date, .field--name-field-event-date');
+                    const dateText = dateNode ? dateNode.innerText.replace(/\s+/g, ' ').trim() : '';
+
+                    // Asukoht
+                    const locNode = row.querySelector('.views-field-field-place, .field--name-field-place');
+                    let locText = locNode ? locNode.innerText.replace(/\s+/g, ' ').trim() : '';
+                    if (!locText) locText = "Elva vald";
+                    
+                    // Lühikirjeldus
+                    const descNode = row.querySelector('.views-field-body, .field--name-body');
+                    const descText = descNode ? descNode.innerText.replace(/\s+/g, ' ').trim() : '';
+
+                    return {
+                        Nimi: title,
+                        Kuupäev: dateText,
+                        Aeg: '', // Jätame tühjaks, info on Kuupäeva tekstis
+                        Koht: locText,
+                        Kirjeldus: descText,
+                        'Plakat (URL)': imgUrl,
+                        Piletilink: '' // Lingi eraldamine Kultuuriakna üldnimekirjast on keeruline, seega QR kood peidetakse
+                    };
+                }).filter(item => item !== null);
+
+                if (parsedData.length > 0) {
+                    renderEvents(parsedData);
+                } else {
+                    document.getElementById('container').innerHTML = `<div class="status-message">Hetkel otsitavaid sündmusi ei leitud.</div>`;
+                }
+
+            } catch (error) {
+                console.error("Viga andmete laadimisel:", error);
+                document.getElementById('container').innerHTML = `<div class="status-message" style="color: #ff6b6b;">Viga andmete laadimisel Kultuuriaknast.<br><span style="font-size:1.2rem; display:block; margin-top:15px; color:#c9d1d9;">Märkus: Gemini turvapiirangud võivad siin eelvaates laadimist blokeerida.<br>Õigeks tööks laadi kood <b>.html</b> failina alla ja ava oma brauseris (nt Chrome).</span></div>`;
+            }
+        }
+
+        // Teleri automaatse kerimise (Auto-Scroll) loogika - TÄIUSTATUD SUJUV KERIMINE
+        let scrollPos = 0;
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function scrollLoop() {
+            if (!isScrolling) return;
+
+            scrollPos += 0.8; // Kerimise kiirus (väiksem number = aeglasem)
+            window.scrollTo(0, scrollPos);
+            
+            // Kontrollime, kas oleme jõudnud lehe lõppu
+            // -2 lisab väikese puhvri, et vältida arvutusvigu erinevatel ekraanidel
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) {
+                isScrolling = false; // Peatame kerimise tsükli
+                
+                // Ootame 3 sekundit lõpus enne üles kerimist
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Ootame, kuni smooth scroll üles jõuab (tavaliselt ~1-2 sek), siis alustame uuesti
+                    setTimeout(() => {
+                        scrollPos = 0;
+                        isScrolling = true;
+                        requestAnimationFrame(scrollLoop);
+                    }, 2000);
+                    
+                }, 3000); 
+                return;
+            }
+
+            requestAnimationFrame(scrollLoop);
+        }
+
+        function startAutoScroll() {
+            // Peatame eelmise kerimise, kui see juhuslikult käib
+            isScrolling = false;
+            scrollPos = 0;
+            window.scrollTo(0,0);
+            
+            // Ootame 5 sekundit peale laadimist, enne kui kerima hakkame
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                isScrolling = true;
+                requestAnimationFrame(scrollLoop);
+            }, 5000);
+        }
+
+        // KÄIVITAMINE
+        loadEvents();
+        
+        // Iga 30 minuti tagant teeb lehele restardi, et laadida uued andmed
+        setInterval(() => window.location.reload(), 30 * 60 * 1000);
+
+    </script>
+</body>
+</html>
