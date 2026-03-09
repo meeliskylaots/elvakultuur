@@ -11,6 +11,7 @@
         :root {
             --bg-color: #0d1117;
             --card-bg: #161b22;
+            --card-hover: #21262d;
             --text-main: #c9d1d9;
             --text-muted: #8b949e;
             --accent: #58a6ff;
@@ -23,7 +24,7 @@
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Peidab koleda kerimisriba teleris */
+            overflow: hidden; /* Peidab kerimisribad */
         }
         
         header {
@@ -36,148 +37,146 @@
             position: fixed;
             top: 0;
             width: 100%;
+            height: 90px;
             box-sizing: border-box;
             z-index: 100;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
         
-        h1 { 
-            margin: 0; 
-            font-weight: 900; 
-            font-size: 2.5rem; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            color: #ffffff;
+        h1 { margin: 0; font-weight: 900; font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; }
+        .clock { font-size: 2.5rem; font-weight: 700; color: var(--accent); }
+        
+        /* Põhipaigutus: Vasakul nimekiri, paremal suur detailvaade */
+        .layout {
+            display: flex;
+            height: calc(100vh - 90px);
+            margin-top: 90px;
+            padding: 30px;
+            gap: 30px;
+            box-sizing: border-box;
         }
         
-        .clock { 
-            font-size: 2.5rem; 
-            font-weight: 700; 
-            color: var(--accent); 
-        }
-        
-        #container {
-            margin-top: 120px; /* Jätab ruumi päisele */
-            padding: 40px;
+        /* VASAK PANEEL (Keriv nimekiri) */
+        .sidebar {
+            width: 35%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden; /* Peidab kasti seest välja mineva sisu */
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            gap: 40px;
-            padding-bottom: 100vh; /* Jätab alla ruumi, et viimane kaart keriks üles */
         }
-        
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            display: flex;
-            height: 450px; /* Teleri jaoks optimeeritud kõrgus */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
+
+        .sidebar-header {
+            padding: 20px;
+            background: #10141a;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: center;
+            z-index: 10;
+        }
+
+        .scroll-container {
+            flex: 1;
+            overflow-y: hidden; /* Kerime seda JS-iga */
             position: relative;
         }
+
+        .scroll-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .list-item {
+            background: rgba(255,255,255,0.03);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border-left: 5px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item.active {
+            background: rgba(88, 166, 255, 0.1);
+            border-left-color: var(--accent);
+        }
+
+        .list-date { font-size: 1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; }
+        .list-title { font-size: 1.3rem; font-weight: 700; color: #fff; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .list-loc { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* PAREM PANEEL (Suur detailvaade) */
+        .featured {
+            width: 65%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: opacity 0.4s ease; /* Sujuv vahetus */
+        }
         
-        .poster {
-            width: 35%;
-            height: 100%;
-            background-color: #0d1117; /* Asendab musta tausta natuke pehmemaga */
-            flex-shrink: 0;
+        .feat-poster {
+            width: 45%;
+            background: #0d1117;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         
-        .poster img {
+        .feat-poster img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             object-position: center;
         }
         
-        .info {
-            width: 65%;
-            padding: 40px;
+        .feat-info {
+            width: 55%;
+            padding: 50px 40px;
             display: flex;
             flex-direction: column;
             position: relative;
             box-sizing: border-box;
         }
         
-        .date-time { 
-            color: var(--accent); 
-            font-size: 1.8rem; 
-            font-weight: 700; 
-            margin-bottom: 10px; 
-            text-transform: uppercase;
-        }
+        .feat-date { color: var(--accent); font-size: 2rem; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; }
+        .feat-title { font-size: 3.5rem; margin: 0 0 20px 0; font-weight: 900; line-height: 1.1; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .feat-loc { font-size: 1.8rem; color: var(--text-muted); margin-bottom: 30px; display: flex; align-items: center; font-weight: 600; }
+        .feat-desc { font-size: 1.5rem; line-height: 1.6; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
         
-        .title { 
-            font-size: 3.5rem; 
-            margin: 0 0 15px 0; 
-            font-weight: 900; 
-            line-height: 1.1; 
-            color: #ffffff;
-            display: -webkit-box;
-            -webkit-line-clamp: 2; /* Piirab pika pealkirja 2 reaga */
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-        }
-        
-        .location { 
-            font-size: 1.6rem; 
-            color: var(--text-muted); 
-            margin-bottom: 25px; 
-            display: flex; 
-            align-items: center;
-            font-weight: 600;
-        }
-        
-        .description { 
-            font-size: 1.4rem; 
-            line-height: 1.6; 
-            opacity: 0.9; 
-            display: -webkit-box;
-            -webkit-line-clamp: 4; /* Piirab pika kirjelduse 4 reaga */
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-            padding-right: 180px; /* Jätab ruumi QR koodile */
-        }
-        
+        /* QR koodi sektsioon asub nüüd kasti allosas */
         .qr-section {
-            position: absolute;
-            bottom: 30px;
-            right: 40px;
+            margin-top: auto; /* Lükkab QR sektsiooni kasti põhja */
             display: flex;
             align-items: center;
-            gap: 20px;
+            justify-content: space-between;
             background: #21262d;
-            padding: 15px 20px;
+            padding: 20px;
             border-radius: 15px;
             border: 1px solid var(--accent);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
         
-        .qr-text { 
-            font-size: 1.2rem; 
-            font-weight: 700; 
-            color: white; 
-            text-align: right; 
-            line-height: 1.3;
-        }
-        
-        .qr-code { 
-            background: white; 
-            padding: 10px; 
-            border-radius: 10px; 
-        }
+        .qr-text-box { display: flex; flex-direction: column; gap: 5px; }
+        .qr-title { font-size: 1.4rem; font-weight: 900; color: white; text-transform: uppercase;}
+        .qr-subtitle { font-size: 1.1rem; color: var(--accent); font-weight: 600; }
+        .qr-code { background: white; padding: 10px; border-radius: 10px; flex-shrink: 0; }
 
-        /* Error/Loading message */
-        .status-message {
-            font-size: 2rem;
-            text-align: center;
-            margin-top: 100px;
-            color: var(--text-muted);
-            padding: 0 40px;
-        }
+        .status-message { font-size: 2rem; text-align: center; margin-top: 20vh; color: var(--text-muted); width: 100%; }
+        
+        /* Peidame featured kasti sisu algselt, kui andmeid veel pole */
+        #featured-content { width: 100%; display: flex; opacity: 0; transition: opacity 0.5s ease;}
     </style>
 </head>
 <body>
@@ -187,15 +186,34 @@
         <div class="clock" id="clock">00:00</div>
     </header>
 
-    <div id="container">
-        <div class="status-message">Laen andmeid Kultuuriaknast...</div>
+    <div id="status-container" class="status-message">Laen andmeid Kultuuriaknast...</div>
+
+    <div class="layout" id="main-layout" style="display: none;">
+        <!-- VASAK: Keriv nimekiri -->
+        <div class="sidebar">
+            <div class="sidebar-header">Tulevased sündmused</div>
+            <div class="scroll-container" id="scroll-container">
+                <div class="scroll-content" id="scroll-content">
+                    <!-- Siia tekivad väikesed kaardid -->
+                </div>
+            </div>
+        </div>
+
+        <!-- PAREM: Fookuses olev sündmus -->
+        <div class="featured" id="featured-box">
+            <div id="featured-content">
+                <!-- Siia tekib suur vaade -->
+            </div>
+        </div>
     </div>
 
     <script>
-        // Kultuuriakna URL (koos sinu valitud filtritega)
         const KULTUURIAKEN_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788&categories=1%7C2%7C3%7C4%7C5%7C6%7C7%7C8%7C9%7C10%7C11%7C12%7C13%7C14%7C15%7C16%7C59%7C60%7C61%7C62%7C63%7C64%7C65%7C17%7C18%7C19%7C20%7C21%7C22%7C85%7C23%7C35%7C87%7C88%7C24&starting_time=5";
         
-        // Mitu proxy't - corsproxy esimeseks, sest see töötas sinu brauseris kõige paremini
+        let globalEvents = [];
+        let currentFeaturedIndex = 0;
+        let featuredInterval;
+
         async function fetchWithProxy(url) {
             const encodedUrl = encodeURIComponent(url);
             const proxies = [
@@ -206,19 +224,15 @@
 
             for (let proxy of proxies) {
                 try {
-                    console.log(`Proovin andmeid laadida läbi: ${proxy}`);
                     const response = await fetch(proxy);
-                    if (response.ok) {
-                        return await response.text();
-                    }
+                    if (response.ok) return await response.text();
                 } catch (e) {
                     console.warn(`Proxy ${proxy} ebaõnnestus.`);
                 }
             }
-            throw new Error("Kõik proxy-serverid ebaõnnestusid või on blokeeritud.");
+            throw new Error("Kõik proxy-serverid ebaõnnestusid.");
         }
 
-        // Kella loogika
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('et-EE', {hour: '2-digit', minute:'2-digit'});
@@ -226,159 +240,193 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Andmete töötlemine ja kaartide loomine
-        function renderEvents(data) {
-            const container = document.getElementById('container');
-            container.innerHTML = ''; // Tühjendame eelmised
+        // Kuvab kõik leitud sündmused vasakule paneelile
+        function renderSidebar() {
+            const scrollContent = document.getElementById('scroll-content');
+            scrollContent.innerHTML = ''; 
 
-            data.forEach((row, index) => {
-                if (!row.Nimi || row.Nimi.trim() === '') return; 
-
-                const card = document.createElement('div');
-                card.className = 'card';
+            globalEvents.forEach((row, index) => {
+                const item = document.createElement('div');
+                item.className = `list-item ${index === 0 ? 'active' : ''}`;
+                item.id = `list-item-${index}`;
                 
-                let qrHTML = '';
-                if (row.Piletilink && row.Piletilink.length > 5) {
-                    qrHTML = `
-                        <div class="qr-section">
-                            <div class="qr-text">Skaneeri ja<br><span style="color:var(--accent)">Osta Pilet!</span></div>
-                            <div class="qr-code" id="qr-${index}"></div>
-                        </div>
-                    `;
-                }
+                const timeString = row.Aeg ? ` | ${row.Aeg}` : '';
+                
+                item.innerHTML = `
+                    <div class="list-date">${row['Kuupäev']}${timeString}</div>
+                    <div class="list-title">${row.Nimi}</div>
+                    <div class="list-loc">📍 ${row.Koht}</div>
+                `;
+                scrollContent.appendChild(item);
+            });
+        }
 
-                const fallbackImg = 'https://via.placeholder.com/600x800/161b22/58a6ff?text=Kultuuris%C3%BCndmus';
-                const imageUrl = row['Plakat (URL)'] && row['Plakat (URL)'].length > 5 
-                    ? row['Plakat (URL)'] 
-                    : fallbackImg;
+        // Vahetab paremal asuvat suurt pilti ja infot
+        function updateFeaturedEvent() {
+            const event = globalEvents[currentFeaturedIndex];
+            if (!event) return;
 
-                const timeString = row.Aeg ? ` kell ${row.Aeg}` : '';
+            // Uuendame vasakut menüüd (aktiivne klass)
+            document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
+            const activeItem = document.getElementById(`list-item-${currentFeaturedIndex}`);
+            if (activeItem) activeItem.classList.add('active');
 
-                // Onerror lisamine hoolitseb selle eest, et kui päris pildi laadimine ebaõnnestub (katkine link vms), 
-                // siis kuvatakse automaatselt asenduspilt ja musti kaste ei teki.
-                card.innerHTML = `
-                    <div class="poster">
+            const contentEl = document.getElementById('featured-content');
+            
+            // Sujuv kadumine
+            contentEl.style.opacity = 0;
+            
+            setTimeout(() => {
+                const fallbackImg = 'https://via.placeholder.com/800x1200/161b22/58a6ff?text=Kultuuris%C3%BCndmus';
+                const imageUrl = event['Plakat (URL)'] && event['Plakat (URL)'].length > 5 ? event['Plakat (URL)'] : fallbackImg;
+                const timeString = event.Aeg ? ` kell ${event.Aeg}` : '';
+
+                // Kui sündmusel pole eraldi URLi leitud, suuname QR koodi Elva kultuuri pealehele
+                const qrTargetUrl = event.EventUrl || 'https://kultuuriaken.tartu.ee/et/syndmused?regions=788';
+
+                contentEl.innerHTML = `
+                    <div class="feat-poster">
                         <img src="${imageUrl}" alt="Plakat" onerror="this.onerror=null;this.src='${fallbackImg}';">
                     </div>
-                    <div class="info">
-                        <div class="date-time">${row['Kuupäev']}${timeString}</div>
-                        <h2 class="title">${row.Nimi}</h2>
-                        <div class="location">📍 ${row.Koht}</div>
-                        <div class="description">${row.Kirjeldus || ''}</div>
-                        ${qrHTML}
+                    <div class="feat-info">
+                        <div class="feat-date">${event['Kuupäev']}${timeString}</div>
+                        <h2 class="feat-title">${event.Nimi}</h2>
+                        <div class="feat-loc">📍 ${event.Koht}</div>
+                        <div class="feat-desc">${event.Kirjeldus}</div>
+                        
+                        <div class="qr-section">
+                            <div class="qr-text-box">
+                                <span class="qr-title">Osta pilet ja vaata lisa</span>
+                                <span class="qr-subtitle">Skaneeri kood telefoniga 👉</span>
+                            </div>
+                            <div class="qr-code" id="qr-featured"></div>
+                        </div>
                     </div>
                 `;
-                container.appendChild(card);
+                
+                // Genereerime uue QR koodi
+                setTimeout(() => {
+                    new QRCode(document.getElementById(`qr-featured`), {
+                        text: qrTargetUrl,
+                        width: 130,
+                        height: 130,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }, 50);
 
-                if (row.Piletilink && row.Piletilink.length > 5) {
-                    setTimeout(() => {
-                        new QRCode(document.getElementById(`qr-${index}`), {
-                            text: row.Piletilink,
-                            width: 110,
-                            height: 110,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.M
-                        });
-                    }, 50);
+                // Sujuv ilmumine
+                contentEl.style.opacity = 1;
+            }, 400); // Ootab 0.4s (sama mis CSS transition), siis vahetab sisu
+        }
+
+        // Seome parempoolse akna vasaku kerimisribaga
+        function checkFeaturedItem() {
+            const container = document.getElementById('scroll-container');
+            if (!container) return;
+
+            const items = document.querySelectorAll('.list-item');
+            if (items.length === 0) return;
+
+            // Fookuse joon: umbes 30% kasti ülaosast (kui element jõuab siia, vahetub parem pilt)
+            const triggerY = container.scrollTop + (container.clientHeight * 0.3);
+
+            let newFeaturedIndex = currentFeaturedIndex;
+            let minDistance = Infinity;
+
+            items.forEach((item, index) => {
+                const itemCenter = item.offsetTop + (item.offsetHeight / 2);
+                const distance = Math.abs(itemCenter - triggerY);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    newFeaturedIndex = index;
                 }
             });
 
-            startAutoScroll();
+            // Kui fookusesse tuleb uus element, vaheta pilti
+            if (newFeaturedIndex !== currentFeaturedIndex) {
+                currentFeaturedIndex = newFeaturedIndex;
+                updateFeaturedEvent();
+            }
         }
 
         async function loadEvents() {
             try {
-                document.getElementById('container').innerHTML = '<div class="status-message">Laen andmeid Kultuuriaknast...</div>';
-                
                 const htmlText = await fetchWithProxy(KULTUURIAKEN_URL);
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(htmlText, "text/html");
                 
-                // 1. TUVATUS: Kas leht ise teatab, et sündmusi pole?
                 const pageText = doc.body ? doc.body.innerText.toLowerCase() : '';
                 if (pageText.includes('ei leitud vasteid') || pageText.includes('otsingule ei leitud')) {
-                    document.getElementById('container').innerHTML = `<div class="status-message">Valitud perioodil ja filtritega ei leitud hetkel ühtegi sündmust.</div>`;
+                    document.getElementById('status-container').innerHTML = `Valitud perioodil ja filtritega ei leitud hetkel ühtegi sündmust.`;
                     return;
                 }
                 
-                // 2. TAVALINE OTSING: Otsime sündmuste elemente klasside järgi
                 const rowSelectors = '.views-row, .event-item, article.node--type-event, .node--view-mode-teaser, .search-result-item, .card, .event-card, .event-row';
                 let rows = Array.from(doc.querySelectorAll(rowSelectors));
                 
-                // 3. ÜLIM VARUPLAAN: Kui klasse ei leitud, otsime kõiki sündmuse linke ja võtame nende ümbrise
                 if (rows.length === 0) {
                     const eventLinks = doc.querySelectorAll('a[href*="/syndmus/"], a[href*="/event/"]');
                     const uniqueRows = new Set();
                     eventLinks.forEach(link => {
                         const container = link.closest('article, li, div[class*="item"], div[class*="card"], div[class*="row"]');
-                        if (container && container.innerText.trim().length > 15) {
-                            uniqueRows.add(container);
-                        }
+                        if (container && container.innerText.trim().length > 15) uniqueRows.add(container);
                     });
                     rows = Array.from(uniqueRows);
                 }
                 
-                // Kui isegi varuplaan ei toimi
                 if (rows.length === 0) {
-                    console.warn("DOM ei leidnud ühtegi sündmuse elementi. Kas nimekiri on tühi või laetakse varjatult (AJAX)?");
-                    document.getElementById('container').innerHTML = `<div class="status-message">Hetkel otsitavaid sündmusi ei leitud.<br><span style="font-size:1rem; opacity:0.7; display:block; margin-top:10px;">(Võimalik, et sündmused puuduvad valitud filtrites või leht kasutab varjatud laadimist)</span></div>`;
+                    document.getElementById('status-container').innerHTML = `Hetkel otsitavaid sündmusi ei leitud.<br><span style="font-size:1rem; opacity:0.7;">(Võimalik, et sündmused puuduvad valitud filtrites)</span>`;
                     return;
                 }
 
-                const parsedData = rows.map(row => {
-                    // Pealkiri
+                globalEvents = rows.map(row => {
                     const titleNode = row.querySelector('.views-field-title a, .node__title a, h2 a, h3 a, h2, h3, h4, .title');
                     const title = titleNode ? titleNode.innerText.trim() : '';
 
                     if (!title) return null;
 
-                    // Pilt (Laiendatud otsing, sh lazy-load atribuudid)
-                    let imgNode = row.querySelector('img');
-                    
-                    // Kui linkide sees pole otsest img tagi, otsime varuplaanina kogu rea seest 
-                    if (!imgNode) {
-                         const parent = row.parentElement;
-                         if(parent) imgNode = parent.querySelector('img');
+                    // URLi kättesaamine QR koodi jaoks (viib sündmuse detaillehele)
+                    let eventUrl = '';
+                    if (titleNode && titleNode.tagName.toLowerCase() === 'a') {
+                        eventUrl = titleNode.getAttribute('href');
+                    } else {
+                        const anyLink = row.querySelector('a[href*="/syndmus/"], a[href*="/event/"]');
+                        if (anyLink) eventUrl = anyLink.getAttribute('href');
                     }
+                    if (eventUrl && eventUrl.startsWith('/')) {
+                        eventUrl = 'https://kultuuriaken.tartu.ee' + eventUrl;
+                    }
+
+                    let imgNode = row.querySelector('img');
+                    if (!imgNode && row.parentElement) imgNode = row.parentElement.querySelector('img');
 
                     let imgUrl = '';
                     if (imgNode) {
-                        // Paljud lehed kasutavad data-src või laisklaadimist
                         imgUrl = imgNode.getAttribute('data-src') || imgNode.getAttribute('src') || imgNode.getAttribute('data-original') || '';
-                        
-                        // Ignoreerime väikseid ikoone või asjatuid SVG-sid, kui need eksikombel leiti
-                        if (imgUrl.includes('.svg') || imgUrl.includes('icon')) {
-                            imgUrl = '';
-                        }
+                        if (imgUrl.includes('.svg') || imgUrl.includes('icon')) imgUrl = '';
                     }
+                    if (imgUrl && imgUrl.startsWith('/')) imgUrl = 'https://kultuuriaken.tartu.ee' + imgUrl;
 
-                    if (imgUrl && imgUrl.startsWith('/')) {
-                        imgUrl = 'https://kultuuriaken.tartu.ee' + imgUrl;
-                    }
-
-                    // Kuupäev ja aeg
                     const dateNode = row.querySelector('.views-field-field-event-date, .field--name-field-event-date, .event-date, .date, time');
                     let dateText = dateNode ? dateNode.innerText.replace(/\s+/g, ' ').trim() : '';
-                    
                     if (!dateText) {
                         const dateMatch = row.innerText.match(/\d{1,2}\.\s*[a-zA-ZäöüõÄÖÜÕ]+\s*(\|\s*\d{2}:\d{2})?/);
                         if (dateMatch) dateText = dateMatch[0];
                     }
 
-                    // Asukoht
                     const locNode = row.querySelector('.views-field-field-place, .field--name-field-place, .event-location, .location');
                     let locText = locNode ? locNode.innerText.replace(/\s+/g, ' ').trim() : '';
                     
-                    // Lühikirjeldus
                     const descNode = row.querySelector('.views-field-body, .field--name-body, .event-description, .description, p');
                     let descText = descNode ? descNode.innerText.replace(/\s+/g, ' ').trim() : '';
 
-                    // Kui spetsiifilist asukohta ei leitud, aga kirjeldus sisaldab rahvamaja vms, korrigeerime seda
                     if (!locText) {
                         if (descText && (descText.includes("Rahvamaja") || descText.includes("Keskus") || descText.includes("Kool"))) {
                             locText = descText;
-                            descText = ""; // Puhastame kirjelduse, kuna see oli tegelikult asukoht
+                            descText = ""; 
                         } else {
                             locText = "Elva vald";
                         }
@@ -391,45 +439,59 @@
                         Koht: locText,
                         Kirjeldus: descText,
                         'Plakat (URL)': imgUrl,
-                        Piletilink: ''
+                        EventUrl: eventUrl 
                     };
                 }).filter(item => item !== null && item.Nimi.length > 0);
 
-                if (parsedData.length > 0) {
-                    renderEvents(parsedData);
+                if (globalEvents.length > 0) {
+                    // Peidame laadimisteate ja näitame põhisisu
+                    document.getElementById('status-container').style.display = 'none';
+                    document.getElementById('main-layout').style.display = 'flex';
+                    
+                    renderSidebar();
+                    currentFeaturedIndex = 0;
+                    updateFeaturedEvent();
+                    startSidebarAutoScroll();
                 } else {
-                    document.getElementById('container').innerHTML = `<div class="status-message">Sündmusi leiti, aga andmeid ei suudetud lugeda.</div>`;
+                    document.getElementById('status-container').innerHTML = `Sündmusi leiti, aga andmeid ei suudetud lugeda.`;
                 }
 
             } catch (error) {
                 console.error("Viga andmete laadimisel:", error);
-                document.getElementById('container').innerHTML = `<div class="status-message" style="color: #ff6b6b;">Viga andmete laadimisel Kultuuriaknast.</div>`;
+                document.getElementById('status-container').innerHTML = `<span style="color: #ff6b6b;">Viga andmete laadimisel Kultuuriaknast.</span>`;
             }
         }
 
-        // Teleri automaatse kerimise (Auto-Scroll) loogika
+        // Vasaku paneeli sujuv pidev kerimine
         let scrollPos = 0;
         let isScrolling = false;
-        let scrollTimeout;
 
         function scrollLoop() {
             if (!isScrolling) return;
 
-            scrollPos += 0.8; 
-            window.scrollTo(0, scrollPos);
+            const container = document.getElementById('scroll-container');
+            if(!container) return;
+
+            scrollPos += 0.5; // Väga aeglane ja sujuv kerimiskiirus
+            container.scrollTop = scrollPos;
             
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) {
+            checkFeaturedItem(); // UUS: Kontrollime igal sammul, milline element on fookuses
+            
+            // Kui jõuame sisu lõppu, kerime sujuvalt algusesse tagasi
+            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
                 isScrolling = false; 
-                
                 setTimeout(() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    container.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Tagasikerimisel paneme kohe esimese elemendi uuesti fookusesse
+                    currentFeaturedIndex = 0;
+                    updateFeaturedEvent();
                     
                     setTimeout(() => {
                         scrollPos = 0;
                         isScrolling = true;
                         requestAnimationFrame(scrollLoop);
-                    }, 2000);
-                    
+                    }, 1500);
                 }, 3000); 
                 return;
             }
@@ -437,20 +499,22 @@
             requestAnimationFrame(scrollLoop);
         }
 
-        function startAutoScroll() {
+        function startSidebarAutoScroll() {
             isScrolling = false;
             scrollPos = 0;
-            window.scrollTo(0,0);
+            const container = document.getElementById('scroll-container');
+            if(container) container.scrollTop = 0;
             
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
+            setTimeout(() => {
                 isScrolling = true;
                 requestAnimationFrame(scrollLoop);
-            }, 5000);
+            }, 5000); // Ootab 5 sek enne kerimise algust
         }
 
+        // KÄIVITAMINE
         loadEvents();
         
+        // Täis-restart iga 30 minuti tagant andmete uuendamiseks
         setInterval(() => window.location.reload(), 30 * 60 * 1000);
 
     </script>
