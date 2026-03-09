@@ -10,98 +10,118 @@
 
     <style>
         :root {
-            --bg-color: #0b1016;
-            --card-bg: #131922;
-            --text-main: #d7dee7;
-            --text-muted: #8e98a4;
-            --accent: #69aefc;
+            /* ELVA VALD AMETLIKUD VÄRVID (VAPP JA LIPP) */
+            --elva-azure: #005aa3;   /* Vapi sinine */
+            --elva-green: #009640;   /* Lipu roheline */
+            --elva-white: #ffffff;   /* Hõbedane/valge */
+            
+            --bg-color: #080b0f;
+            --card-bg: #11161d;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: var(--elva-azure);
             --border-faint: rgba(255,255,255,0.05);
-            --header-h: 60px;
+            --header-h: 65px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: var(--bg-color);
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 100% 0%, rgba(0, 90, 163, 0.12), transparent 35%),
+                radial-gradient(circle at 0% 100%, rgba(0, 150, 64, 0.08), transparent 35%);
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
             overflow: hidden;
             height: 100vh;
         }
 
         header {
-            background: rgba(11, 16, 22, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 0 24px;
+            background: rgba(11, 14, 20, 0.98);
+            backdrop-filter: blur(15px);
+            padding: 0 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(105, 174, 252, 0.25);
             position: fixed;
-            top: 0;
-            width: 100%;
-            height: var(--header-h);
+            top: 0; width: 100%; height: var(--header-h);
             z-index: 100;
         }
 
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(to right, 
+                var(--elva-white) 33.3%, 
+                var(--elva-azure) 33.3%, 
+                var(--elva-azure) 66.6%, 
+                var(--elva-green) 66.6%);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .elva-vapp {
+            width: 40px;
+            height: 48px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
         h1 {
-            margin: 0;
             font-weight: 900;
             font-size: 1.3rem;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: #ffffff;
-            letter-spacing: -0.01em;
         }
 
         .clock {
-            font-size: 1.55rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            color: var(--accent);
+            color: var(--elva-white);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 15px rgba(0, 90, 163, 0.5);
         }
 
         .layout {
             display: flex;
             height: calc(100vh - var(--header-h));
             margin-top: var(--header-h);
-            padding: 14px;
-            gap: 14px;
+            padding: 15px;
+            gap: 15px;
         }
 
         .sidebar {
             width: 28%;
-            background: rgba(19, 25, 34, 0.78);
-            border-radius: 18px;
+            background: rgba(17, 22, 29, 0.85);
+            border-radius: 16px;
             border: 1px solid var(--border-faint);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
         .sidebar-header {
-            padding: 12px 14px;
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            font-size: 0.75rem;
             font-weight: 800;
-            font-size: 0.76rem;
             text-transform: uppercase;
+            text-align: center;
             color: var(--text-muted);
             border-bottom: 1px solid var(--border-faint);
+            letter-spacing: 1px;
         }
 
-        .scroll-container {
-            flex: 1;
-            overflow-y: auto;
-            scrollbar-width: none;
-        }
-
+        .scroll-container { flex: 1; overflow-y: auto; scrollbar-width: none; }
         .scroll-container::-webkit-scrollbar { display: none; }
-
-        .scroll-content {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .scroll-content { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
 
         .list-item {
             background: rgba(255,255,255,0.02);
@@ -111,239 +131,133 @@
             align-items: center;
             gap: 12px;
             border: 1px solid transparent;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .list-item.active {
-            background: rgba(105, 174, 252, 0.08);
-            border-color: rgba(105, 174, 252, 0.22);
+            background: rgba(0, 90, 163, 0.15);
+            border-color: rgba(0, 90, 163, 0.4);
+            transform: translateX(5px);
         }
 
         .list-thumb {
-            width: 60px;
-            height: 60px;
+            width: 55px; height: 55px;
             border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
             background: #000;
+            border: 1px solid var(--border-faint);
         }
 
-        .list-text {
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
-        }
-
-        .list-date {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: var(--accent);
-            text-transform: uppercase;
-            line-height: 1.2;
-        }
-
-        .list-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1.2;
-        }
-
-        .list-loc {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            line-height: 1.2;
-        }
+        .list-text { overflow: hidden; display: flex; flex-direction: column; gap: 2px; }
+        .list-date { font-size: 0.6rem; font-weight: 800; color: var(--elva-azure); text-transform: uppercase; }
+        .list-title { font-size: 0.85rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-loc { font-size: 0.7rem; color: var(--text-muted); }
 
         .featured {
             width: 72%;
             background: #000;
-            border-radius: 20px;
+            border-radius: 16px;
             position: relative;
             overflow: hidden;
             border: 1px solid var(--border-faint);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.5);
         }
 
         #featured-inner {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             opacity: 0;
-            transition: opacity 0.35s ease;
+            transition: opacity 0.6s ease;
             position: relative;
             z-index: 2;
         }
 
         .feat-bg-blur {
-            position: absolute;
-            inset: 0;
-            filter: blur(60px) brightness(0.2);
+            position: absolute; inset: 0;
+            filter: blur(60px) brightness(0.15);
             object-fit: cover;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             z-index: 1;
-            transform: scale(1.15);
         }
 
         .feat-surface {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             display: flex;
-            align-items: center;
-            gap: 28px;
-            padding: 28px 32px;
-            background: linear-gradient(to bottom, rgba(11,16,22,0.55) 0%, rgba(11,16,22,0.92) 100%);
+            padding: 40px;
+            gap: 40px;
+            background: linear-gradient(135deg, rgba(8, 11, 15, 0.4) 0%, rgba(8, 11, 15, 0.95) 100%);
         }
 
-        .feat-info-wrap {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            max-width: 56%;
-        }
+        .feat-surface.portrait { flex-direction: row; align-items: center; }
+        .feat-surface.landscape { flex-direction: column; }
 
-        .feat-side {
-            width: 34%;
-            min-width: 250px;
-            max-width: 340px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+        .feat-poster-wrap { display: flex; align-items: center; justify-content: center; }
+        .portrait .feat-poster-wrap { height: 100%; width: 48%; }
+        .landscape .feat-poster-wrap { width: 100%; height: 58%; }
 
-        .feat-poster-wrap {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .feat-info-wrap { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+        .portrait .feat-info-wrap { flex: 1; }
+        .landscape .feat-info-wrap { width: 100%; flex: 1; padding-top: 20px; }
 
         .poster-img {
-            width: 100%;
-            max-width: 320px;
-            max-height: 350px;
+            max-width: 100%; max-height: 100%;
             object-fit: contain;
             border-radius: 12px;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.55);
-            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .feat-date {
-            color: var(--accent);
-            font-size: 0.95rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
+        .feat-date { color: var(--elva-azure); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+        .feat-title { color: #fff; font-size: 2.4rem; font-weight: 900; line-height: 1.1; margin-bottom: 15px; letter-spacing: -0.02em; }
+        .feat-loc { color: var(--elva-green); font-size: 1.2rem; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+        .feat-desc { color: var(--text-main); opacity: 0.9; font-size: 1.05rem; line-height: 1.6; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .landscape .feat-desc { -webkit-line-clamp: 5; }
+        .portrait .feat-desc { -webkit-line-clamp: 12; }
 
-        .feat-title {
-            color: #fff;
-            font-size: 2.05rem;
-            font-weight: 900;
-            line-height: 1.05;
-            margin: 0 0 12px 0;
-            letter-spacing: -0.03em;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .feat-loc {
-            color: var(--text-main);
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 14px;
-            line-height: 1.3;
-        }
-
-        .feat-desc {
-            color: var(--text-main);
-            opacity: 0.9;
-            font-size: 0.98rem;
-            line-height: 1.55;
-            display: -webkit-box;
-            -webkit-line-clamp: 8;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            max-width: 95%;
+        .feat-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding-top: 20px;
         }
 
         .qr-box {
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            padding: 6px;
-            border-radius: 10px;
+            border: 1px solid var(--elva-azure);
+            padding: 10px;
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            box-shadow: 0 4px 20px rgba(0, 90, 163, 0.2);
         }
+        .qr-label { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; color: #fff; opacity: 0.8; }
+        .qr-canvas { background: #fff; padding: 4px; border-radius: 6px; line-height: 0; }
 
-        .qr-label {
-            font-size: 0.48rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: #d9e2eb;
-            line-height: 1.1;
-            text-align: center;
-            opacity: 0.85;
-        }
-
-        .qr-canvas {
-            background: #fff;
-            padding: 3px;
-            border-radius: 4px;
-            line-height: 0;
-        }
-
-        .status-msg {
-            font-size: 1.8rem;
-            text-align: center;
-            margin-top: 40vh;
-            color: var(--text-muted);
-            width: 100%;
-        }
-
-        @media (max-width: 1200px) {
-            .feat-surface {
-                gap: 22px;
-                padding: 24px 26px;
-            }
-
-            .feat-title {
-                font-size: 1.75rem;
-            }
-
-            .feat-desc {
-                font-size: 0.92rem;
-                -webkit-line-clamp: 7;
-            }
-
-            .poster-img {
-                max-width: 280px;
-                max-height: 310px;
-            }
-        }
+        .status-msg { font-size: 1.8rem; text-align: center; margin-top: 40vh; color: var(--text-muted); width: 100%; font-weight: 700; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Elva Valla Kultuur</h1>
+    <div class="logo-area">
+        <svg class="elva-vapp" viewBox="0 0 100 120">
+            <path fill="#005aa3" d="M10,0 h80 v70 c0,30 -40,50 -40,50 c0,0 -40,-20 -40,-50 Z" />
+            <g fill="#ffffff">
+                <path d="M50 20 L62 45 L53 45 L68 75 L55 75 L70 95 L30 95 L45 75 L32 75 L47 45 L38 45 Z" />
+                <path transform="translate(-25, 15) scale(0.75)" d="M50 20 L62 45 L53 45 L68 75 L55 75 L70 95 L30 95 L45 75 L32 75 L47 45 L38 45 Z" opacity="0.9" />
+                <path transform="translate(25, 15) scale(0.75)" d="M50 20 L62 45 L53 45 L68 75 L55 75 L70 95 L30 95 L45 75 L32 75 L47 45 L38 45 Z" opacity="0.9" />
+            </g>
+        </svg>
+        <h1>Elva Valla Kultuur</h1>
+    </div>
     <div class="clock" id="clock">00:00</div>
 </header>
 
-<div id="loader" class="status-msg">Laen sündmusi...</div>
+<div id="loader" class="status-msg">Uuendan Elva sündmusi...</div>
 
 <div class="layout" id="main-ui" style="display:none;">
     <aside class="sidebar">
@@ -366,33 +280,64 @@
     let activeIdx = -1;
     let autoAdvanceTimer = null;
 
-    const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect width="100%" height="100%" fill="#131922"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#69aefc" font-family="Arial" font-size="60" font-weight="700">Elva Kultuur</text></svg>');
+    const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect width="100%" height="100%" fill="#11161d"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#005aa3" font-family="Arial" font-size="60" font-weight="700">Elva Vald</text></svg>');
 
-    function escapeHtml(v) {
-        return String(v ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
+    function escapeHtml(v) { return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
+    /**
+     * TÄIUSTATUD ANDMETE LAADIMINE
+     * Kontrollib vastuse sisu tüüpi ja proovib alternatiivseid proksi-teenuseid.
+     */
     async function fetchEvents() {
-        const url = `https://api.allorigins.win/get?url=${encodeURIComponent(SCRIPT_URL)}&cache=${Date.now()}`;
-        const res = await fetch(url);
-        const json = await res.json();
-        const data = JSON.parse(json.contents);
-        return (Array.isArray(data) ? data : data.events || []).filter(e => e.title);
+        const encodedUrl = encodeURIComponent(SCRIPT_URL);
+        const proxies = [
+            `https://api.allorigins.win/get?url=${encodedUrl}&timestamp=${Date.now()}`,
+            `https://corsproxy.io/?${encodedUrl}`,
+            SCRIPT_URL // Otsepäring brauserist (töötab vaid teatud CORS lubadega)
+        ];
+
+        for (const url of proxies) {
+            try {
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) continue;
+
+                let data;
+                if (url.includes('allorigins')) {
+                    const json = await res.json();
+                    const contents = json.contents;
+                    // Kontrollime, kas contents on JSON string
+                    if (contents && contents.trim().startsWith('{') || contents.trim().startsWith('[')) {
+                        data = JSON.parse(contents);
+                    } else {
+                        console.warn("AllOrigins tagastas vigase sisu (tõenäoliselt HTML veateade).");
+                        continue;
+                    }
+                } else {
+                    const text = await res.text();
+                    // Kontrollime, kas tekst on JSON
+                    if (text && text.trim().startsWith('{') || text.trim().startsWith('[')) {
+                        data = JSON.parse(text);
+                    } else {
+                        console.warn("Proksi tagastas andmete asemel HTML-i.");
+                        continue;
+                    }
+                }
+
+                const events = (Array.isArray(data) ? data : (data.events || data.data || []))
+                    .filter(e => e && e.title);
+
+                if (events.length > 0) return events;
+            } catch (e) {
+                console.warn(`Viga laadimisel allikast ${url}:`, e);
+            }
+        }
+        throw new Error("Andmeid ei õnnestunud ühestki allikast laadida (tõenäoliselt Google Scripti viga).");
     }
 
     function updateClock() {
-        document.getElementById("clock").textContent = new Date().toLocaleTimeString("et-EE", {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
+        document.getElementById("clock").textContent = new Date().toLocaleTimeString("et-EE", { hour: "2-digit", minute: "2-digit" });
     }
-
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateClock, 1000); updateClock();
 
     function renderList() {
         const list = document.getElementById("scroll-list");
@@ -414,75 +359,91 @@
         const ev = allEvents[idx];
 
         document.querySelectorAll(".list-item").forEach(el => el.classList.remove("active"));
-        document.getElementById(`ev-${idx}`)?.classList.add("active");
+        const listEl = document.getElementById(`ev-${idx}`);
+        if (listEl) listEl.classList.add('active');
 
         const inner = document.getElementById("featured-inner");
         inner.style.opacity = 0;
 
         setTimeout(() => {
             const posterSrc = ev.img || PLACEHOLDER;
-
+            
             inner.innerHTML = `
                 <img src="${posterSrc}" class="feat-bg-blur">
-                <div class="feat-surface">
+                <div class="feat-surface" id="feat-surface">
+                    <div class="feat-poster-wrap">
+                        <img src="${posterSrc}" class="poster-img" id="main-poster" onerror="this.src='${PLACEHOLDER}'">
+                    </div>
                     <div class="feat-info-wrap">
                         <div class="feat-date">${escapeHtml(ev.date)}</div>
                         <h2 class="feat-title">${escapeHtml(ev.title)}</h2>
                         <div class="feat-loc">📍 ${escapeHtml(ev.loc || "Elva vald")}</div>
                         <div class="feat-desc">${escapeHtml(ev.desc || "Lisainfo saamiseks skaneeri QR-kood.")}</div>
-                    </div>
-
-                    <div class="feat-side">
-                        <div class="feat-poster-wrap">
-                            <img src="${posterSrc}" class="poster-img" onerror="this.src='${PLACEHOLDER}'">
-                        </div>
-
-                        <div class="qr-box">
-                            <div class="qr-label">Info</div>
-                            <div class="qr-canvas" id="qr-code"></div>
+                        
+                        <div class="feat-footer">
+                            <div class="qr-box">
+                                <div class="qr-label">INFO JA PILETID</div>
+                                <div class="qr-canvas" id="qr-code"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
 
-            new QRCode(document.getElementById("qr-code"), {
-                text: ev.url || "https://elvakultuur.ee",
-                width: 56,
-                height: 56,
-                colorDark: "#000",
-                colorLight: "#fff",
-                correctLevel: QRCode.CorrectLevel.M
-            });
-
-            inner.style.opacity = 1;
-        }, 180);
+            const img = new Image();
+            img.src = posterSrc;
+            img.onload = () => {
+                const surface = document.getElementById('feat-surface');
+                if (!surface) return;
+                
+                if (img.naturalWidth > img.naturalHeight) {
+                    surface.classList.add('landscape');
+                } else {
+                    surface.classList.add('portrait');
+                }
+                
+                new QRCode(document.getElementById("qr-code"), {
+                    text: ev.url || "https://elvakultuur.ee",
+                    width: 70, height: 70, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M
+                });
+                
+                inner.style.opacity = 1;
+            };
+            img.onerror = () => {
+                const surface = document.getElementById('feat-surface');
+                if (surface) {
+                    surface.classList.add('portrait');
+                    inner.style.opacity = 1;
+                }
+            };
+        }, 150);
     }
 
     function autoCycle() {
+        if (!allEvents.length) return;
         const next = (activeIdx + 1) % allEvents.length;
         switchFeatured(next);
-
         const container = document.getElementById("scroll-container");
         const item = document.getElementById(`ev-${next}`);
-        if (item) {
-            container.scrollTo({ top: item.offsetTop - 100, behavior: "smooth" });
-        }
+        if (item && container) container.scrollTo({ top: item.offsetTop - 100, behavior: "smooth" });
     }
 
     async function init() {
+        const loader = document.getElementById("loader");
         try {
             allEvents = await fetchEvents();
             if (allEvents.length > 0) {
-                document.getElementById("loader").style.display = "none";
+                loader.style.display = "none";
                 document.getElementById("main-ui").style.display = "flex";
                 renderList();
                 switchFeatured(0);
                 autoAdvanceTimer = setInterval(autoCycle, DISPLAY_MS);
             } else {
-                document.getElementById("loader").textContent = "Sündmusi ei leitud.";
+                loader.textContent = "Sündmusi ei leitud.";
             }
         } catch (e) {
-            document.getElementById("loader").innerHTML = `<span style="color:#f87171">Viga andmete laadimisel.</span>`;
+            console.error("Viga:", e);
+            loader.innerHTML = `<span style="color:#f87171">Viga andmete laadimisel.</span><br><small style="font-size:0.8rem; opacity:0.7;">${e.message}</small>`;
         }
     }
 
