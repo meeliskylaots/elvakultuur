@@ -6,22 +6,27 @@
     <title>Elva Valla Kultuuriekraan</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --accent: #58a6ff;
-            --border-color: #30363d;
+            --bg-color: #0b1016;
+            --card-bg: #131922;
+            --panel-bg: rgba(19, 25, 34, 0.92);
+            --text-main: #d7dee7;
+            --text-muted: #8e98a4;
+            --accent: #69aefc;
+            --border-soft: rgba(255,255,255,0.08);
+            --border-faint: rgba(255,255,255,0.05);
         }
 
         * { box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-color);
+            background:
+                radial-gradient(circle at 70% 35%, rgba(74, 129, 255, 0.10), transparent 28%),
+                radial-gradient(circle at 30% 70%, rgba(255, 90, 90, 0.05), transparent 22%),
+                var(--bg-color);
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
             margin: 0;
@@ -30,61 +35,66 @@
         }
 
         header {
-            background-color: rgba(13, 17, 23, 0.98);
-            padding: 14px 28px;
+            background: rgba(11, 16, 22, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--accent);
+            border-bottom: 1px solid rgba(105, 174, 252, 0.45);
             position: fixed;
             top: 0;
             width: 100%;
-            height: 76px;
+            height: 68px;
             z-index: 100;
         }
 
         h1 {
             margin: 0;
             font-weight: 900;
-            font-size: 1.85rem;
+            font-size: 1.55rem;
+            letter-spacing: -0.02em;
             text-transform: uppercase;
             color: #ffffff;
         }
 
         .clock {
-            font-size: 2.15rem;
-            font-weight: 700;
+            font-size: 1.9rem;
+            font-weight: 800;
             color: var(--accent);
+            letter-spacing: -0.03em;
         }
 
         .layout {
             display: flex;
-            height: calc(100vh - 76px);
-            margin-top: 76px;
+            height: calc(100vh - 68px);
+            margin-top: 68px;
             padding: 18px;
             gap: 18px;
         }
 
         .sidebar {
             width: 30%;
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
+            background: rgba(19, 25, 34, 0.72);
+            backdrop-filter: blur(10px);
+            border-radius: 22px;
+            border: 1px solid var(--border-faint);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.20);
         }
 
         .sidebar-header {
-            padding: 14px;
-            background: #10141a;
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 700;
-            font-size: 0.95rem;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--border-faint);
+            font-weight: 800;
+            font-size: 0.92rem;
             text-transform: uppercase;
-            color: var(--text-muted);
-            text-align: center;
+            color: #dce5ef;
+            text-align: left;
+            letter-spacing: 0;
         }
 
         .scroll-container {
@@ -99,37 +109,37 @@
         }
 
         .scroll-content {
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
         .list-item {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.025);
             padding: 10px;
-            border-radius: 12px;
-            border-left: 5px solid transparent;
-            transition: all 0.35s ease;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 12px;
-            min-height: 94px;
+            min-height: 92px;
         }
 
         .list-item.active {
-            background: rgba(88, 166, 255, 0.15);
-            border-left-color: var(--accent);
-            transform: scale(1.02);
+            background: rgba(105, 174, 252, 0.10);
+            border-color: rgba(105, 174, 252, 0.30);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
         }
 
         .list-thumb {
             width: 74px;
             height: 74px;
-            border-radius: 10px;
+            border-radius: 12px;
             object-fit: cover;
             background-color: #0d1117;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
         }
 
@@ -150,7 +160,7 @@
         }
 
         .list-title {
-            font-size: 0.95rem;
+            font-size: 0.98rem;
             font-weight: 700;
             color: #fff;
             line-height: 1.2;
@@ -160,7 +170,7 @@
         }
 
         .list-loc {
-            font-size: 0.72rem;
+            font-size: 0.74rem;
             color: var(--text-muted);
             line-height: 1.25;
             display: -webkit-box;
@@ -171,21 +181,21 @@
 
         .featured {
             width: 70%;
-            background: #000;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
+            border-radius: 24px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+            border: 1px solid var(--border-faint);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+            background: #0c1219;
         }
 
         .feat-bg-blur {
             position: absolute;
             inset: 0;
             z-index: 1;
-            filter: blur(60px) brightness(0.22);
+            filter: blur(70px) brightness(0.22);
             object-fit: cover;
-            transform: scale(1.2);
+            transform: scale(1.18);
             width: 100%;
             height: 100%;
         }
@@ -194,10 +204,11 @@
             position: absolute;
             inset: 0;
             z-index: 2;
-            padding: 28px 30px;
-            background: linear-gradient(to top, rgba(13,17,23,0.98) 0%, rgba(13,17,23,0.82) 100%);
+            padding: 34px 34px 30px 34px;
+            background:
+                linear-gradient(to top, rgba(11,16,22,0.96) 0%, rgba(11,16,22,0.82) 58%, rgba(11,16,22,0.55) 100%);
             display: flex;
-            gap: 26px;
+            gap: 34px;
         }
 
         .feat-main {
@@ -205,24 +216,23 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
-            padding-right: 6px;
+            justify-content: center;
+            padding-right: 8px;
         }
 
         .feat-side {
-            width: 240px;
+            width: 195px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            gap: 18px;
+            gap: 14px;
         }
 
         .feat-poster-wrap {
             width: 100%;
-            flex: 1;
-            min-height: 0;
+            height: 250px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -237,80 +247,83 @@
 
         .feat-poster-main img {
             max-width: 100%;
-            max-height: 320px;
+            max-height: 250px;
             object-fit: contain;
-            border-radius: 10px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 12px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.06);
         }
 
         .feat-date {
             color: var(--accent);
-            font-size: 1.15rem;
+            font-size: 1rem;
             font-weight: 800;
             margin-bottom: 10px;
             text-transform: uppercase;
             line-height: 1.2;
+            letter-spacing: -0.01em;
         }
 
         .feat-title {
-            font-size: 2rem;
-            margin: 0 0 10px 0;
+            font-size: 2.15rem;
+            margin: 0 0 12px 0;
             font-weight: 900;
-            line-height: 1.08;
+            line-height: 1.04;
             color: #ffffff;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            max-width: 95%;
+            max-width: 92%;
+            letter-spacing: -0.03em;
         }
 
         .feat-loc {
             font-size: 1.02rem;
-            color: #e6edf3;
-            margin-bottom: 12px;
+            color: #eef3f8;
+            margin-bottom: 14px;
             font-weight: 600;
             line-height: 1.3;
         }
 
         .feat-desc {
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 1.55;
             opacity: 0.96;
-            color: #c9d1d9;
+            color: #d4dbe4;
             display: -webkit-box;
             -webkit-line-clamp: 8;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            max-width: 94%;
+            max-width: 88%;
         }
 
         .qr-card {
-            background: rgba(33, 38, 45, 0.96);
-            padding: 10px;
+            background: rgba(255,255,255,0.035);
+            padding: 7px;
             border-radius: 12px;
-            border: 1px solid var(--accent);
+            border: 1px solid rgba(255,255,255,0.06);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            gap: 6px;
+            box-shadow: none;
             flex-shrink: 0;
         }
 
         .qr-label {
-            font-size: 0.64rem;
-            font-weight: 900;
-            color: white;
+            font-size: 0.56rem;
+            font-weight: 800;
+            color: #d9e2eb;
             text-transform: uppercase;
             text-align: center;
             line-height: 1.15;
+            opacity: 0.9;
         }
 
         .qr-target {
             background: white;
-            padding: 5px;
+            padding: 4px;
             border-radius: 6px;
         }
 
@@ -331,21 +344,15 @@
         }
 
         @media (max-width: 1200px) {
-            .feat-side {
-                width: 210px;
-            }
-
-            .feat-title {
-                font-size: 1.75rem;
-            }
-
+            h1 { font-size: 1.42rem; }
+            .clock { font-size: 1.7rem; }
+            .feat-side { width: 178px; }
+            .feat-poster-wrap { height: 220px; }
+            .feat-poster-main img { max-height: 220px; }
+            .feat-title { font-size: 1.9rem; }
             .feat-desc {
                 font-size: 0.94rem;
                 -webkit-line-clamp: 7;
-            }
-
-            .feat-poster-main img {
-                max-height: 270px;
             }
         }
     </style>
@@ -592,8 +599,8 @@
 
             new QRCode(qrBox, {
                 text: ev.url || DEFAULT_TARGET_URL,
-                width: 86,
-                height: 86,
+                width: 72,
+                height: 72,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.M
