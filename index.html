@@ -91,6 +91,7 @@
             flex: 1;
             overflow-y: hidden;
             position: relative;
+            scroll-behavior: auto;
         }
 
         .scroll-content {
@@ -327,7 +328,10 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
     const DEFAULT_TARGET_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788";
-    const SCROLL_SPEED = 25;
+    
+    // ARVUTUS: Ühe elemendi kõrgus on ca 126px. 
+    // 126px / 20s = 6.3px/s, et iga üritus püsiks fookuses 20 sekundit.
+    const SCROLL_SPEED = 6.3; 
 
     let allEvents = [];
     let activeIdx = -1;
@@ -379,167 +383,100 @@
     function safeJsonParse(input) {
         if (input == null) return null;
         if (typeof input === "object") return input;
-
         const text = String(input).trim();
         if (!text) return null;
-
-        try {
-            return JSON.parse(text);
-        } catch (err) {
-            return null;
-        }
+        try { return JSON.parse(text); } catch (err) { return null; }
     }
 
     function extractEventsArray(data) {
         if (Array.isArray(data)) return data;
         if (Array.isArray(data?.events)) return data.events;
         if (Array.isArray(data?.data)) return data.data;
-        if (Array.isArray(data?.items)) return data.items;
-        if (Array.isArray(data?.results)) return data.results;
         return [];
     }
 
     function normalizeEvent(raw) {
         if (!raw || typeof raw !== "object") return null;
-
         const title = normalizeText(raw.title);
         if (!title) return null;
-
-        const date = normalizeText(raw.date || "Täpsustamisel");
-        const loc = normalizeText(raw.loc || "Elva vald");
-        const desc = truncate(raw.desc || "");
-        const img = normalizeUrl(raw.img || "");
-        const url = normalizeUrl(raw.url || DEFAULT_TARGET_URL);
-        const startIso = normalizeText(raw.startIso || "");
-
-        return { title, date, loc, desc, img, url, startIso };
+        return {
+            title,
+            date: normalizeText(raw.date || "Täpsustamisel"),
+            loc: normalizeText(raw.loc || "Elva vald"),
+            desc: truncate(raw.desc || ""),
+            img: normalizeUrl(raw.img || ""),
+            url: normalizeUrl(raw.url || DEFAULT_TARGET_URL),
+            startIso: normalizeText(raw.startIso || "")
+        };
     }
 
     async function fetchWithTimeout(url, timeout = 12000) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeout);
-
         try {
-            return await fetch(url, {
-                method: "GET",
-                cache: "no-store",
-                signal: controller.signal
-            });
-        } finally {
-            clearTimeout(timer);
-        }
-    }
-
-    async function parseAttemptResponse(type, response) {
-        if (type === "direct-json") {
-            const text = await response.text();
-            return safeJsonParse(text);
-        }
-
-        if (type === "allorigins") {
-            const wrapper = await response.json();
-            return safeJsonParse(wrapper?.contents);
-        }
-
-        const text = await response.text();
-        return safeJsonParse(text);
+            return await fetch(url, { method: "GET", cache: "no-store", signal: controller.signal });
+        } finally { clearTimeout(timer); }
     }
 
     async function fetchEventsRobustly() {
         const encodedUrl = encodeURIComponent(SCRIPT_URL);
-
         const attempts = [
-            { type: "direct-json", url: SCRIPT_URL },
-            { type: "allorigins", url: `https://api.allorigins.win/get?url=${encodedUrl}` },
-            { type: "plain-text", url: `https://corsproxy.io/?${encodedUrl}` },
-            { type: "plain-text", url: `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}` }
+            { type: "direct", url: SCRIPT_URL },
+            { type: "allorigins", url: `https://api.allorigins.win/get?url=${encodedUrl}` }
         ];
 
         for (const attempt of attempts) {
             try {
-                const res = await fetchWithTimeout(attempt.url, 12000);
+                const res = await fetchWithTimeout(attempt.url);
                 if (!res.ok) continue;
-
-                const parsed = await parseAttemptResponse(attempt.type, res);
+                const body = await (attempt.type === "allorigins" ? res.json() : res.text());
+                const parsed = attempt.type === "allorigins" ? safeJsonParse(body?.contents) : safeJsonParse(body);
+                
                 const events = extractEventsArray(parsed)
                     .map(normalizeEvent)
                     .filter(Boolean)
-                    .sort((a, b) => {
-                        if (!a.startIso || !b.startIso) return 0;
-                        return new Date(a.startIso) - new Date(b.startIso);
-                    });
+                    .sort((a, b) => (a.startIso && b.startIso) ? new Date(a.startIso) - new Date(b.startIso) : 0);
 
-                if (events.length > 0) {
-                    return events;
-                }
-            } catch (err) {
-            }
+                if (events.length > 0) return events;
+            } catch (err) {}
         }
-
-        throw new Error("Ükski andmeallikas ei vastanud sobiva JSON-iga.");
+        throw new Error("Andmete laadimine ebaõnnestus.");
     }
 
     function updateClock() {
         document.getElementById("clock").textContent = new Date().toLocaleTimeString("et-EE", {
-            hour: "2-digit",
-            minute: "2-digit"
+            hour: "2-digit", minute: "2-digit"
         });
     }
-
     setInterval(updateClock, 1000);
     updateClock();
-
-    function createImageElement(src, className, altText = "") {
-        const img = document.createElement("img");
-        img.className = className;
-        img.alt = altText;
-        img.src = src || PLACEHOLDER_IMG;
-        img.onerror = function () {
-            this.onerror = null;
-            this.src = PLACEHOLDER_IMG;
-        };
-        return img;
-    }
 
     function renderList() {
         const list = document.getElementById("scroll-list");
         list.innerHTML = "";
-
         allEvents.forEach((ev, i) => {
             const item = document.createElement("div");
             item.className = "list-item";
             item.id = `ev-${i}`;
-
-            const thumb = createImageElement(ev.img, "list-thumb", ev.title);
-
-            const textWrap = document.createElement("div");
-            textWrap.className = "list-text-content";
-
-            const date = document.createElement("div");
-            date.className = "list-date";
-            date.textContent = ev.date || "Kuupäev puudub";
-
-            const title = document.createElement("div");
-            title.className = "list-title";
-            title.textContent = ev.title || "Pealkiri";
-
-            const loc = document.createElement("div");
-            loc.className = "list-loc";
-            loc.textContent = "📍 " + (ev.loc || "Elva vald");
-
-            textWrap.appendChild(date);
-            textWrap.appendChild(title);
-            textWrap.appendChild(loc);
-
+            const thumb = document.createElement("img");
+            thumb.className = "list-thumb";
+            thumb.src = ev.img || PLACEHOLDER_IMG;
+            thumb.onerror = () => { thumb.src = PLACEHOLDER_IMG; };
+            
+            const textWrap = `
+                <div class="list-text-content">
+                    <div class="list-date">${escapeHtml(ev.date)}</div>
+                    <div class="list-title">${escapeHtml(ev.title)}</div>
+                    <div class="list-loc">📍 ${escapeHtml(ev.loc)}</div>
+                </div>`;
             item.appendChild(thumb);
-            item.appendChild(textWrap);
+            item.insertAdjacentHTML('beforeend', textWrap);
             list.appendChild(item);
         });
     }
 
     function switchFeatured(idx) {
         if (idx === activeIdx || !allEvents[idx]) return;
-
         activeIdx = idx;
         const ev = allEvents[idx];
 
@@ -551,19 +488,17 @@
 
         setTimeout(() => {
             const poster = escapeHtml(ev.img || PLACEHOLDER_IMG);
-            const target = ev.url || DEFAULT_TARGET_URL;
-
             inner.innerHTML = `
-                <img src="${poster}" class="feat-bg-blur" alt="">
+                <img src="${poster}" class="feat-bg-blur" alt="" onerror="this.src='${PLACEHOLDER_IMG}'">
                 <div class="feat-poster-main">
-                    <img src="${poster}" alt="${escapeHtml(ev.title)}">
+                    <img src="${poster}" alt="${escapeHtml(ev.title)}" onerror="this.src='${PLACEHOLDER_IMG}'">
                 </div>
                 <div class="feat-overlay">
                     <div class="feat-content">
                         <div class="feat-text-wrap">
-                            <div class="feat-date">${escapeHtml(ev.date || "Täpsustamisel")}</div>
-                            <h2 class="feat-title">${escapeHtml(ev.title || "")}</h2>
-                            <div class="feat-loc">📍 ${escapeHtml(ev.loc || "Elva vald")}</div>
+                            <div class="feat-date">${escapeHtml(ev.date)}</div>
+                            <h2 class="feat-title">${escapeHtml(ev.title)}</h2>
+                            <div class="feat-loc">📍 ${escapeHtml(ev.loc)}</div>
                             <div class="feat-desc">${escapeHtml(ev.desc || "Vaata lisainfot QR-koodist.")}</div>
                         </div>
                         <div class="qr-card">
@@ -571,40 +506,21 @@
                             <div class="qr-target" id="qr-box"></div>
                         </div>
                     </div>
-                </div>
-            `;
-
-            inner.querySelectorAll("img").forEach(img => {
-                img.onerror = function () {
-                    this.onerror = null;
-                    this.src = PLACEHOLDER_IMG;
-                };
-            });
+                </div>`;
 
             const qrElement = document.getElementById("qr-box");
-            qrElement.innerHTML = "";
-
             new QRCode(qrElement, {
-                text: target,
-                width: 120,
-                height: 120,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
+                text: ev.url || DEFAULT_TARGET_URL,
+                width: 120, height: 120, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M
             });
-
             inner.style.opacity = 1;
         }, 250);
     }
 
     function animateScroll(ts) {
         if (!isScrolling) return;
-
         const container = document.getElementById("scroll-container");
-        if (!container) return;
-
-        const items = document.querySelectorAll(".list-item");
-        if (!items.length) return;
+        if (!container || !allEvents.length) return;
 
         if (container.scrollHeight <= container.clientHeight + 4) {
             switchFeatured(0);
@@ -619,67 +535,55 @@
         container.scrollTop = scrollY;
 
         const mid = container.scrollTop + (container.clientHeight / 2);
+        const items = document.querySelectorAll(".list-item");
         let bestIdx = 0;
         let bestDist = Infinity;
 
         items.forEach((it, i) => {
-            const dist = Math.abs((it.offsetTop + it.offsetHeight / 2) - mid);
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIdx = i;
-            }
+            const center = it.offsetTop + it.offsetHeight / 2;
+            const dist = Math.abs(center - mid);
+            if (dist < bestDist) { bestDist = dist; bestIdx = i; }
         });
 
         switchFeatured(bestIdx);
 
         if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
             isScrolling = false;
-
             setTimeout(() => {
                 container.scrollTo({ top: 0, behavior: "smooth" });
                 scrollY = 0;
                 lastTs = 0;
-
                 setTimeout(() => {
                     isScrolling = true;
                     requestAnimationFrame(animateScroll);
                 }, 2000);
-            }, 3000);
-
+            }, 5000); // Pikem paus lõpus
             return;
         }
-
         requestAnimationFrame(animateScroll);
     }
 
     async function init() {
         const loader = document.getElementById("loader");
         const mainUi = document.getElementById("main-ui");
-
         try {
             allEvents = await fetchEventsRobustly();
-
             if (allEvents.length > 0) {
                 loader.style.display = "none";
                 mainUi.style.display = "flex";
                 renderList();
                 switchFeatured(0);
-
-                if (allEvents.length > 1) {
-                    requestAnimationFrame(animateScroll);
-                }
+                if (allEvents.length > 1) requestAnimationFrame(animateScroll);
             } else {
-                loader.textContent = "Selle kuu tulevasi sündmusi ei leitud.";
+                loader.textContent = "Sündmusi ei leitud.";
             }
         } catch (e) {
-            console.error(e);
-            loader.innerHTML = `<span style="color:#ff6b6b">Viga andmete laadimisel.</span><br><small style="font-size:1rem; opacity:0.6">${escapeHtml(e.message)}</small>`;
+            loader.innerHTML = `<span style="color:#ff6b6b">Viga laadimisel.</span>`;
         }
     }
 
     init();
     setInterval(() => window.location.reload(), 30 * 60 * 1000);
 </script>
-
 </body>
 </html>
