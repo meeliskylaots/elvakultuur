@@ -24,7 +24,7 @@
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Peidab kerimisribad */
+            overflow: hidden;
         }
         
         header {
@@ -46,7 +46,6 @@
         h1 { margin: 0; font-weight: 900; font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; }
         .clock { font-size: 2.5rem; font-weight: 700; color: var(--accent); }
         
-        /* Põhipaigutus: Vasakul nimekiri, paremal suur detailvaade */
         .layout {
             display: flex;
             height: calc(100vh - 90px);
@@ -56,7 +55,7 @@
             box-sizing: border-box;
         }
         
-        /* VASAK PANEEL (Keriv nimekiri) */
+        /* VASAK PANEEL */
         .sidebar {
             width: 35%;
             background: var(--card-bg);
@@ -96,73 +95,91 @@
 
         .list-item {
             background: rgba(255,255,255,0.03);
-            padding: 20px 20px; /* Tegin kaste veidi kõrgemaks */
+            padding: 15px;
             border-radius: 12px;
             border-left: 5px solid transparent;
             transition: all 0.3s ease;
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            flex-direction: row;
+            align-items: center;
+            gap: 15px;
         }
 
         .list-item.active {
             background: rgba(88, 166, 255, 0.1);
             border-left-color: var(--accent);
-            transform: scale(1.02); /* Fookuses olev kastike hüppab kergelt esile */
+            transform: scale(1.02);
         }
 
-        .list-date { font-size: 1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; }
-        .list-title { font-size: 1.3rem; font-weight: 700; color: #fff; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .list-loc { font-size: 0.9rem; color: var(--text-muted); }
+        .list-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+        }
 
-        /* PAREM PANEEL (Kino-stiilis täisekraan poster) */
+        .list-text-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            overflow: hidden;
+        }
+
+        .list-date { font-size: 0.9rem; color: var(--accent); font-weight: 700; text-transform: uppercase; }
+        .list-title { font-size: 1.15rem; font-weight: 700; color: #fff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-loc { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* PAREM PANEEL - PLAKAT FOOKUSES */
         .featured {
             width: 65%;
-            background: var(--card-bg);
+            background: #000;
             border-radius: 20px;
             border: 1px solid var(--border-color);
             display: flex;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             transition: opacity 0.4s ease;
-            position: relative; /* Vajalik absolute positsioneerimiseks */
+            position: relative;
         }
         
-        .feat-poster {
+        /* Bluritud taustapilt täitmiseks */
+        .feat-bg-blur {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
-            background-color: #0d1117;
-        }
-        
-        .feat-poster img {
-            width: 100%;
-            height: 100%;
+            filter: blur(30px) brightness(0.4);
             object-fit: cover;
-            object-position: center top;
-            opacity: 0.6; /* Teeb pildi kergelt tumedamaks, et tekst oleks loetav */
+            transform: scale(1.1);
         }
 
-        /* Tume hajutatud gradient alt üles, tagab teksti loetavuse */
-        .feat-poster::after {
-            content: '';
+        /* Terav plakat keskel */
+        .feat-poster-main {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to top, rgba(13,17,23,1) 0%, rgba(13,17,23,0.8) 35%, rgba(13,17,23,0) 100%);
-        }
-        
-        .feat-info {
-            position: relative;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 2;
-            width: 100%;
-            height: 100%;
-            padding: 50px;
             display: flex;
-            flex-direction: column;
-            justify-content: flex-end; /* Lükkab sisu alla serva */
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+        }
+
+        .feat-poster-main img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Hoiab plakati proportsioonid õigena */
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Alumine info kiht */
+        .feat-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            z-index: 3;
+            padding: 60px 50px 40px;
+            background: linear-gradient(to top, rgba(13,17,23,1) 0%, rgba(13,17,23,0.9) 60%, rgba(13,17,23,0) 100%);
             box-sizing: border-box;
         }
 
@@ -173,36 +190,29 @@
             gap: 40px;
         }
         
-        .feat-text {
-            flex: 1;
-        }
-
-        .feat-date { color: var(--accent); font-size: 2rem; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .feat-title { font-size: 3.5rem; margin: 0 0 20px 0; font-weight: 900; line-height: 1.1; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 2px 15px rgba(0,0,0,0.9); }
-        .feat-loc { font-size: 1.8rem; color: #e6edf3; margin-bottom: 20px; display: flex; align-items: center; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        .feat-desc { font-size: 1.5rem; line-height: 1.6; opacity: 0.95; color: #c9d1d9; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .feat-text { flex: 1; }
+        .feat-date { color: var(--accent); font-size: 2rem; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+        .feat-title { font-size: 3.2rem; margin: 0 0 15px 0; font-weight: 900; line-height: 1.1; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .feat-loc { font-size: 1.6rem; color: #e6edf3; margin-bottom: 15px; display: flex; align-items: center; font-weight: 600; }
+        .feat-desc { font-size: 1.3rem; line-height: 1.5; opacity: 0.85; color: #c9d1d9; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         
-        .qr-section {
-            background: rgba(33, 38, 45, 0.85); /* Poolläbipaistev taust */
-            backdrop-filter: blur(10px);
-            padding: 20px;
+        .qr-container {
+            background: rgba(33, 38, 45, 0.95);
+            padding: 15px;
             border-radius: 15px;
             border: 1px solid var(--accent);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            flex-shrink: 0;
         }
         
-        .qr-text-box { display: flex; flex-direction: column; gap: 5px; }
-        .qr-title { font-size: 1.4rem; font-weight: 900; color: white; text-transform: uppercase;}
-        .qr-subtitle { font-size: 1.1rem; color: var(--accent); font-weight: 600; }
-        .qr-code { background: white; padding: 10px; border-radius: 10px; flex-shrink: 0; }
+        .qr-label { font-size: 0.9rem; font-weight: 800; color: white; text-transform: uppercase; text-align: center; line-height: 1.1; }
+        .qr-code-box { background: white; padding: 8px; border-radius: 8px; }
 
         .status-message { font-size: 2rem; text-align: center; margin-top: 20vh; color: var(--text-muted); width: 100%; }
-        
-        #featured-content { width: 100%; height: 100%; display: flex; opacity: 0; transition: opacity 0.5s ease;}
+        #featured-content { width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease; }
     </style>
 </head>
 <body>
@@ -215,21 +225,15 @@
     <div id="status-container" class="status-message">Laen andmeid Kultuuriaknast...</div>
 
     <div class="layout" id="main-layout" style="display: none;">
-        <!-- VASAK: Keriv nimekiri -->
         <div class="sidebar">
-            <div class="sidebar-header">Tulevased sündmused</div>
+            <div class="sidebar-header">Sündmuste voog</div>
             <div class="scroll-container" id="scroll-container">
-                <div class="scroll-content" id="scroll-content">
-                    <!-- Siia tekivad väikesed kaardid -->
-                </div>
+                <div class="scroll-content" id="scroll-content"></div>
             </div>
         </div>
 
-        <!-- PAREM: Fookuses olev sündmus -->
         <div class="featured" id="featured-box">
-            <div id="featured-content">
-                <!-- Siia tekib suur vaade -->
-            </div>
+            <div id="featured-content"></div>
         </div>
     </div>
 
@@ -243,19 +247,15 @@
             const encodedUrl = encodeURIComponent(url);
             const proxies = [
                 `https://corsproxy.io/?${encodedUrl}`,
-                `https://api.allorigins.win/raw?url=${encodedUrl}`,
-                `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`
+                `https://api.allorigins.win/raw?url=${encodedUrl}`
             ];
-
             for (let proxy of proxies) {
                 try {
                     const response = await fetch(proxy);
                     if (response.ok) return await response.text();
-                } catch (e) {
-                    console.warn(`Proxy ${proxy} ebaõnnestus.`);
-                }
+                } catch (e) {}
             }
-            throw new Error("Kõik proxy-serverid ebaõnnestusid.");
+            throw new Error("Proxy viga.");
         }
 
         function updateClock() {
@@ -268,18 +268,19 @@
         function renderSidebar() {
             const scrollContent = document.getElementById('scroll-content');
             scrollContent.innerHTML = ''; 
-
             globalEvents.forEach((row, index) => {
                 const item = document.createElement('div');
                 item.className = `list-item ${index === 0 ? 'active' : ''}`;
                 item.id = `list-item-${index}`;
-                
-                const timeString = row.Aeg ? ` | ${row.Aeg}` : '';
-                
+                const fallbackImg = 'https://dummyimage.com/150x150/161b22/58a6ff.png&text=+';
+                const imageUrl = row['Plakat (URL)'] || fallbackImg;
                 item.innerHTML = `
-                    <div class="list-date">${row['Kuupäev']}${timeString}</div>
-                    <div class="list-title">${row.Nimi}</div>
-                    <div class="list-loc">📍 ${row.Koht}</div>
+                    <img src="${imageUrl}" class="list-thumb" onerror="this.src='${fallbackImg}';">
+                    <div class="list-text-content">
+                        <div class="list-date">${row['Kuupäev']}</div>
+                        <div class="list-title">${row.Nimi}</div>
+                        <div class="list-loc">📍 ${row.Koht}</div>
+                    </div>
                 `;
                 scrollContent.appendChild(item);
             });
@@ -289,249 +290,130 @@
             const event = globalEvents[currentFeaturedIndex];
             if (!event) return;
 
-            // Uuendame vasakut menüüd (aktiivne klass)
             document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
             const activeItem = document.getElementById(`list-item-${currentFeaturedIndex}`);
             if (activeItem) activeItem.classList.add('active');
 
             const contentEl = document.getElementById('featured-content');
-            
             contentEl.style.opacity = 0;
             
             setTimeout(() => {
-                // Töökindlam varupilt
                 const fallbackImg = 'https://dummyimage.com/1200x800/161b22/58a6ff.png&text=Kultuuris%C3%BCndmus';
-                const imageUrl = event['Plakat (URL)'] && event['Plakat (URL)'].length > 5 ? event['Plakat (URL)'] : fallbackImg;
-                const timeString = event.Aeg ? ` kell ${event.Aeg}` : '';
-                const qrTargetUrl = event.EventUrl || 'https://kultuuriaken.tartu.ee/et/syndmused?regions=788';
+                const imageUrl = event['Plakat (URL)'] || fallbackImg;
+                const qrUrl = event.EventUrl || 'https://kultuuriaken.tartu.ee';
 
                 contentEl.innerHTML = `
-                    <div class="feat-poster">
-                        <img src="${imageUrl}" alt="Plakat" onerror="this.onerror=null;this.src='${fallbackImg}';">
+                    <img src="${imageUrl}" class="feat-bg-blur" onerror="this.src='${fallbackImg}';">
+                    <div class="feat-poster-main">
+                        <img src="${imageUrl}" alt="Plakat" onerror="this.src='${fallbackImg}';">
                     </div>
-                    <div class="feat-info">
+                    <div class="feat-overlay">
                         <div class="feat-content-wrapper">
                             <div class="feat-text">
-                                <div class="feat-date">${event['Kuupäev']}${timeString}</div>
+                                <div class="feat-date">${event['Kuupäev']}</div>
                                 <h2 class="feat-title">${event.Nimi}</h2>
                                 <div class="feat-loc">📍 ${event.Koht}</div>
                                 <div class="feat-desc">${event.Kirjeldus}</div>
                             </div>
-                            
-                            <div class="qr-section">
-                                <div class="qr-text-box">
-                                    <span class="qr-title">Osta pilet / Lisa info</span>
-                                    <span class="qr-subtitle">Skaneeri kood telefoniga 👉</span>
-                                </div>
-                                <div class="qr-code" id="qr-featured"></div>
+                            <div class="qr-container">
+                                <div class="qr-label">INFO JA<br>PILETID</div>
+                                <div class="qr-code-box" id="qr-feat"></div>
                             </div>
                         </div>
                     </div>
                 `;
                 
-                setTimeout(() => {
-                    new QRCode(document.getElementById(`qr-featured`), {
-                        text: qrTargetUrl,
-                        width: 130,
-                        height: 130,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.M
-                    });
-                }, 50);
+                new QRCode(document.getElementById(`qr-feat`), {
+                    text: qrUrl, width: 110, height: 110, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M
+                });
 
                 contentEl.style.opacity = 1;
             }, 400); 
         }
 
-        function checkFeaturedItem() {
-            const container = document.getElementById('scroll-container');
-            if (!container) return;
-
-            const items = document.querySelectorAll('.list-item');
-            if (items.length === 0) return;
-
-            // UUS FOOKUS: Täpselt kasti keskkoht (0.5). 
-            // Sündmus püsib esiletõstetuna kogu aja, mis kulub tal kasti keskosa läbimiseks.
-            const triggerY = container.scrollTop + (container.clientHeight * 0.5);
-
-            let newFeaturedIndex = currentFeaturedIndex;
-            let minDistance = Infinity;
-
-            items.forEach((item, index) => {
-                const itemCenter = item.offsetTop + (item.offsetHeight / 2);
-                const distance = Math.abs(itemCenter - triggerY);
-
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    newFeaturedIndex = index;
-                }
-            });
-
-            if (newFeaturedIndex !== currentFeaturedIndex) {
-                currentFeaturedIndex = newFeaturedIndex;
-                updateFeaturedEvent();
-            }
-        }
-
         async function loadEvents() {
             try {
                 const htmlText = await fetchWithProxy(KULTUURIAKEN_URL);
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlText, "text/html");
+                const doc = new DOMParser().parseFromString(htmlText, "text/html");
+                const rows = doc.querySelectorAll('.views-row, article, .event-item');
                 
-                const pageText = doc.body ? doc.body.innerText.toLowerCase() : '';
-                if (pageText.includes('ei leitud vasteid') || pageText.includes('otsingule ei leitud')) {
-                    document.getElementById('status-container').innerHTML = `Valitud perioodil ja filtritega ei leitud hetkel ühtegi sündmust.`;
-                    return;
-                }
-                
-                const rowSelectors = '.views-row, .event-item, article.node--type-event, .node--view-mode-teaser, .search-result-item, .card, .event-card, .event-row';
-                let rows = Array.from(doc.querySelectorAll(rowSelectors));
-                
-                if (rows.length === 0) {
-                    const eventLinks = doc.querySelectorAll('a[href*="/syndmus/"], a[href*="/event/"]');
-                    const uniqueRows = new Set();
-                    eventLinks.forEach(link => {
-                        const container = link.closest('article, li, div[class*="item"], div[class*="card"], div[class*="row"]');
-                        if (container && container.innerText.trim().length > 15) uniqueRows.add(container);
-                    });
-                    rows = Array.from(uniqueRows);
-                }
-                
-                if (rows.length === 0) {
-                    document.getElementById('status-container').innerHTML = `Hetkel otsitavaid sündmusi ei leitud.<br><span style="font-size:1rem; opacity:0.7;">(Võimalik, et sündmused puuduvad valitud filtrites)</span>`;
-                    return;
-                }
+                globalEvents = Array.from(rows).map(row => {
+                    const titleNode = row.querySelector('h2 a, h3 a, .title a, a[href*="/syndmus/"]');
+                    if (!titleNode) return null;
 
-                globalEvents = rows.map(row => {
-                    const titleNode = row.querySelector('.views-field-title a, .node__title a, h2 a, h3 a, h2, h3, h4, .title');
-                    const title = titleNode ? titleNode.innerText.trim() : '';
+                    const title = titleNode.innerText.trim();
+                    let eventUrl = titleNode.getAttribute('href');
+                    if (eventUrl && eventUrl.startsWith('/')) eventUrl = 'https://kultuuriaken.tartu.ee' + eventUrl;
 
-                    if (!title) return null;
-
-                    let eventUrl = '';
-                    if (titleNode && titleNode.tagName.toLowerCase() === 'a') {
-                        eventUrl = titleNode.getAttribute('href');
-                    } else {
-                        const anyLink = row.querySelector('a[href*="/syndmus/"], a[href*="/event/"]');
-                        if (anyLink) eventUrl = anyLink.getAttribute('href');
-                    }
-                    if (eventUrl && eventUrl.startsWith('/')) {
-                        eventUrl = 'https://kultuuriaken.tartu.ee' + eventUrl;
-                    }
-
-                    let imgNode = row.querySelector('img');
-                    if (!imgNode && row.parentElement) imgNode = row.parentElement.querySelector('img');
-
-                    let imgUrl = '';
-                    if (imgNode) {
-                        imgUrl = imgNode.getAttribute('data-src') || imgNode.getAttribute('src') || imgNode.getAttribute('data-original') || '';
-                        if (imgUrl.includes('.svg') || imgUrl.includes('icon')) imgUrl = '';
-                    }
+                    const imgNode = row.querySelector('img');
+                    let imgUrl = imgNode ? (imgNode.getAttribute('data-src') || imgNode.getAttribute('src')) : '';
                     if (imgUrl && imgUrl.startsWith('/')) imgUrl = 'https://kultuuriaken.tartu.ee' + imgUrl;
 
-                    const dateNode = row.querySelector('.views-field-field-event-date, .field--name-field-event-date, .event-date, .date, time');
-                    let dateText = dateNode ? dateNode.innerText.replace(/\s+/g, ' ').trim() : '';
-                    if (!dateText) {
-                        const dateMatch = row.innerText.match(/\d{1,2}\.\s*[a-zA-ZäöüõÄÖÜÕ]+\s*(\|\s*\d{2}:\d{2})?/);
-                        if (dateMatch) dateText = dateMatch[0];
-                    }
+                    const dateNode = row.querySelector('.views-field-field-event-date, .date, time');
+                    const dateText = dateNode ? dateNode.innerText.trim() : 'Kuupäev täpsustamisel';
 
-                    const locNode = row.querySelector('.views-field-field-place, .field--name-field-place, .event-location, .location');
-                    let locText = locNode ? locNode.innerText.replace(/\s+/g, ' ').trim() : '';
-                    
-                    const descNode = row.querySelector('.views-field-body, .field--name-body, .event-description, .description, p');
-                    let descText = descNode ? descNode.innerText.replace(/\s+/g, ' ').trim() : '';
+                    const locNode = row.querySelector('.views-field-field-place, .location');
+                    const locText = locNode ? locNode.innerText.trim() : 'Elva vald';
 
-                    if (!locText) {
-                        if (descText && (descText.includes("Rahvamaja") || descText.includes("Keskus") || descText.includes("Kool"))) {
-                            locText = descText;
-                            descText = ""; 
-                        } else {
-                            locText = "Elva vald";
-                        }
-                    }
+                    const descNode = row.querySelector('.views-field-body, .description, p');
+                    const descText = descNode ? descNode.innerText.trim() : '';
 
-                    return {
-                        Nimi: title,
-                        Kuupäev: dateText,
-                        Aeg: '',
-                        Koht: locText,
-                        Kirjeldus: descText,
-                        'Plakat (URL)': imgUrl,
-                        EventUrl: eventUrl 
-                    };
-                }).filter(item => item !== null && item.Nimi.length > 0);
+                    return { Nimi: title, Kuupäev: dateText, Koht: locText, Kirjeldus: descText, 'Plakat (URL)': imgUrl, EventUrl: eventUrl };
+                }).filter(i => i && i.Nimi);
 
                 if (globalEvents.length > 0) {
                     document.getElementById('status-container').style.display = 'none';
                     document.getElementById('main-layout').style.display = 'flex';
-                    
                     renderSidebar();
-                    currentFeaturedIndex = 0;
                     updateFeaturedEvent();
-                    startSidebarAutoScroll();
-                } else {
-                    document.getElementById('status-container').innerHTML = `Sündmusi leiti, aga andmeid ei suudetud lugeda.`;
+                    startAutoScroll();
                 }
-
-            } catch (error) {
-                console.error("Viga andmete laadimisel:", error);
-                document.getElementById('status-container').innerHTML = `<span style="color: #ff6b6b;">Viga andmete laadimisel Kultuuriaknast.</span>`;
+            } catch (e) {
+                document.getElementById('status-container').innerText = "Viga andmete laadimisel.";
             }
         }
 
         let scrollPos = 0;
-        let isScrolling = false;
+        let isScrolling = true;
 
         function scrollLoop() {
             if (!isScrolling) return;
-
             const container = document.getElementById('scroll-container');
-            if(!container) return;
-
-            scrollPos += 0.5; 
+            scrollPos += 0.5;
             container.scrollTop = scrollPos;
-            
-            checkFeaturedItem(); 
-            
-            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
-                isScrolling = false; 
-                setTimeout(() => {
-                    container.scrollTo({ top: 0, behavior: 'smooth' });
-                    
-                    currentFeaturedIndex = 0;
-                    updateFeaturedEvent();
-                    
-                    setTimeout(() => {
-                        scrollPos = 0;
-                        isScrolling = true;
-                        requestAnimationFrame(scrollLoop);
-                    }, 1500);
-                }, 3000); 
-                return;
+
+            const triggerY = container.scrollTop + (container.clientHeight * 0.5);
+            const items = document.querySelectorAll('.list-item');
+            let closestIdx = currentFeaturedIndex;
+            let minDist = Infinity;
+
+            items.forEach((item, idx) => {
+                const dist = Math.abs((item.offsetTop + item.offsetHeight/2) - triggerY);
+                if (dist < minDist) { minDist = dist; closestIdx = idx; }
+            });
+
+            if (closestIdx !== currentFeaturedIndex) {
+                currentFeaturedIndex = closestIdx;
+                updateFeaturedEvent();
             }
 
+            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
+                isScrolling = false;
+                setTimeout(() => {
+                    container.scrollTo({ top: 0, behavior: 'smooth' });
+                    currentFeaturedIndex = 0;
+                    updateFeaturedEvent();
+                    setTimeout(() => { scrollPos = 0; isScrolling = true; requestAnimationFrame(scrollLoop); }, 2000);
+                }, 3000);
+                return;
+            }
             requestAnimationFrame(scrollLoop);
         }
 
-        function startSidebarAutoScroll() {
-            isScrolling = false;
-            scrollPos = 0;
-            const container = document.getElementById('scroll-container');
-            if(container) container.scrollTop = 0;
-            
-            setTimeout(() => {
-                isScrolling = true;
-                requestAnimationFrame(scrollLoop);
-            }, 5000); 
-        }
+        function startAutoScroll() { requestAnimationFrame(scrollLoop); }
 
         loadEvents();
-        
         setInterval(() => window.location.reload(), 30 * 60 * 1000);
-
     </script>
 </body>
 </html>
