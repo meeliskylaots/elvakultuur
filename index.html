@@ -109,8 +109,8 @@
         }
 
         .list-thumb {
-            width: 85px;
-            height: 85px;
+            width: 90px;
+            height: 90px;
             border-radius: 10px;
             object-fit: cover;
             background-color: #0d1117;
@@ -145,7 +145,7 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
-            filter: blur(50px) brightness(0.2);
+            filter: blur(60px) brightness(0.2);
             object-fit: cover;
             transform: scale(1.2);
         }
@@ -157,16 +157,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-bottom: 220px; /* Jätab ruumi alumisele infole */
+            padding-bottom: 220px;
             box-sizing: border-box;
         }
 
         .feat-poster-main img {
             max-width: 95%;
-            max-height: 85%;
+            max-height: 90%;
             object-fit: contain;
             border-radius: 8px;
-            box-shadow: 0 0 60px rgba(0,0,0,0.9);
+            box-shadow: 0 0 60px rgba(0,0,0,1);
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -235,6 +235,7 @@
     </div>
 
     <script>
+        // Sinu Kultuuriakna URL
         const KULTUURIAKEN_URL = "https://kultuuriaken.tartu.ee/et/syndmused?categories=1%7C2%7C3%7C4%7C5%7C6%7C7%7C8%7C9%7C10%7C11%7C12%7C13%7C14%7C15%7C16%7C59%7C60%7C61%7C62%7C63%7C64%7C65%7C17%7C18%7C19%7C20%7C21%7C22%7C85%7C23%7C35%7C87%7C88%7C24&starting_time=4&regions=788";
         
         let allEvents = [];
@@ -242,6 +243,7 @@
         let isScrolling = true;
         let scrollY = 0;
 
+        // Nutikam proxy-laadija
         async function getHtml(url) {
             const encoded = encodeURIComponent(url);
             const proxies = [
@@ -252,7 +254,6 @@
 
             for (let p of proxies) {
                 try {
-                    console.log(`Proovin laadida läbi: ${p}`);
                     const res = await fetch(p);
                     if (!res.ok) continue;
 
@@ -263,11 +264,9 @@
                         const text = await res.text();
                         if (text && text.length > 500) return text;
                     }
-                } catch (e) {
-                    console.warn(`Proxy ebaõnnestus: ${p}`);
-                }
+                } catch (e) {}
             }
-            throw new Error("Ükski proxy ei andnud vastust.");
+            throw new Error("Ükski proxy ei saanud sisu kätte.");
         }
 
         function updateClock() {
@@ -310,7 +309,7 @@
             inner.style.opacity = 0;
 
             setTimeout(() => {
-                const posterFallback = 'https://dummyimage.com/1200x800/161b22/58a6ff.png&text=Kultuuri%C3%BCritus';
+                const posterFallback = 'https://dummyimage.com/1200x800/161b22/58a6ff.png&text=Kultuuris%C3%BCndmus';
                 const poster = ev.img || posterFallback;
                 const target = ev.url || 'https://kultuuriaken.tartu.ee';
 
@@ -348,7 +347,7 @@
                 const html = await getHtml(KULTUURIAKEN_URL);
                 const doc = new DOMParser().parseFromString(html, "text/html");
                 
-                // Otsime sündmuste ridu (views-row või article)
+                // Uuendatud sündmuste tuvastamise loogika
                 let nodes = Array.from(doc.querySelectorAll('.views-row, article, .node--type-event, .event-item'));
                 
                 if (nodes.length === 0) {
@@ -365,7 +364,7 @@
                 }
 
                 allEvents = nodes.map(n => {
-                    // Pealkiri ja URL
+                    // Pealkiri
                     const tNode = n.querySelector('h2 a, h3 a, .node__title a, .title a, a[href*="/syndmus/"]');
                     if (!tNode) return null;
 
@@ -373,16 +372,14 @@
                     let url = tNode.getAttribute('href');
                     if (url && url.startsWith('/')) url = 'https://kultuuriaken.tartu.ee' + url;
 
-                    // TÄIUSTATUD PILDITUVASTUS (otsime klasside ja srcset järgi)
+                    // Pilt (skaneerime põhjalikumalt)
                     let img = '';
-                    const imgNode = n.querySelector('.field--name-field-image img, .views-field-field-image img, img');
+                    const imgNode = n.querySelector('img');
                     if (imgNode) {
-                        // Kontrollime srcset-i, mis on tihti Kultuuriaknas kasutusel
                         const srcset = imgNode.getAttribute('srcset');
                         if (srcset) {
                             const sets = srcset.split(',');
-                            const bestSet = sets[sets.length - 1].trim().split(' ')[0];
-                            img = bestSet;
+                            img = sets[sets.length - 1].trim().split(' ')[0];
                         } else {
                             img = imgNode.getAttribute('data-src') || imgNode.getAttribute('src') || '';
                         }
@@ -391,15 +388,20 @@
                         if (img.includes('.svg') || img.length < 15) img = '';
                     }
 
-                    // Kuupäeva tuvastus
+                    // Kuupäev (skaneerime põhjalikumalt)
                     const dNode = n.querySelector('.node__event-date, .field--name-field-event-date, .views-field-field-event-date, time, .date');
-                    const date = dNode ? dNode.innerText.trim().replace(/\s+/g, ' ') : 'Kuupäev täpsustamisel';
+                    let date = dNode ? dNode.innerText.trim().replace(/\s+/g, ' ') : '';
+                    if (!date) {
+                        // Varuplaan: otsime teksti mustrit "PP. kuu"
+                        const match = n.innerText.match(/\d{1,2}\.\s*[a-zA-ZäöüõÄÖÜÕ]+/);
+                        date = match ? match[0] : 'Kuupäev täpsustamisel';
+                    }
 
-                    // Asukoha tuvastus
+                    // Asukoht
                     const lNode = n.querySelector('.field--name-field-place, .views-field-field-place, .location, .place');
                     const loc = lNode ? lNode.innerText.trim() : 'Elva vald';
 
-                    // Kirjelduse tuvastus
+                    // Kirjeldus
                     const bNode = n.querySelector('.field--name-body, .views-field-body, .description, p');
                     const desc = bNode ? bNode.innerText.trim().substring(0, 180) + '...' : '';
 
@@ -413,11 +415,11 @@
                     switchFeatured(0);
                     requestAnimationFrame(animateScroll);
                 } else {
-                    document.getElementById('loader').innerHTML = "Hetkel valitud filtritega sündmusi ei leitud.<br><span style='font-size:1.2rem; opacity:0.6;'>Kontrolli filtreid Kultuuriaknas.</span>";
+                    document.getElementById('loader').innerHTML = "Hetkel sündmusi ei leitud. Kontrolli filtreid.";
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('loader').innerHTML = `<span style="color: #ff6b6b;">Viga andmete laadimisel Kultuuriaknast.</span><br><span style="font-size:1rem; opacity:0.7;">${e.message}</span>`;
+                document.getElementById('loader').innerHTML = `Viga andmete laadimisel Kultuuriaknast.`;
             }
         }
 
