@@ -173,6 +173,7 @@
             text-align: center;
             margin-top: 100px;
             color: var(--text-muted);
+            padding: 0 40px;
         }
     </style>
 </head>
@@ -191,12 +192,12 @@
         // Kultuuriakna URL (koos sinu valitud filtritega)
         const KULTUURIAKEN_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788&categories=1%7C2%7C3%7C4%7C5%7C6%7C7%7C8%7C9%7C10%7C11%7C12%7C13%7C14%7C15%7C16%7C59%7C60%7C61%7C62%7C63%7C64%7C65%7C17%7C18%7C19%7C20%7C21%7C22%7C85%7C23%7C35%7C87%7C88%7C24&starting_time=5";
         
-        // Mitu proxy't, juhuks kui üks peaks alt vedama või blokeeritakse
+        // Mitu proxy't - corsproxy esimeseks, sest see töötas sinu brauseris kõige paremini
         async function fetchWithProxy(url) {
             const encodedUrl = encodeURIComponent(url);
             const proxies = [
-                `https://api.allorigins.win/raw?url=${encodedUrl}`,
                 `https://corsproxy.io/?${encodedUrl}`,
+                `https://api.allorigins.win/raw?url=${encodedUrl}`,
                 `https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`
             ];
 
@@ -228,13 +229,11 @@
             container.innerHTML = ''; // Tühjendame eelmised
 
             data.forEach((row, index) => {
-                // Kontrollime, et rida poleks tühi (kontrollime nime olemasolu)
                 if (!row.Nimi || row.Nimi.trim() === '') return; 
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 
-                // QR koodi HTML loogika
                 let qrHTML = '';
                 if (row.Piletilink && row.Piletilink.length > 5) {
                     qrHTML = `
@@ -249,7 +248,6 @@
                     ? row['Plakat (URL)'] 
                     : 'https://via.placeholder.com/600x800/161b22/58a6ff?text=Kultuuris%C3%BCndmus';
 
-                // Vormindame aja kuvamise sõltuvalt sellest, kas meil on eraldi kellaaeg või on see juba kuupäeva sees
                 const timeString = row.Aeg ? ` kell ${row.Aeg}` : '';
 
                 card.innerHTML = `
@@ -266,7 +264,6 @@
                 `;
                 container.appendChild(card);
 
-                // Genereerime QR koodi pildi, kui link on olemas
                 if (row.Piletilink && row.Piletilink.length > 5) {
                     setTimeout(() => {
                         new QRCode(document.getElementById(`qr-${index}`), {
@@ -277,41 +274,56 @@
                             colorLight: "#ffffff",
                             correctLevel: QRCode.CorrectLevel.M
                         });
-                    }, 50); // Väike viivitus tagab, et DOM on valmis
+                    }, 50);
                 }
             });
 
-            // Käivitame kerimise alles siis, kui andmed on laetud
             startAutoScroll();
         }
 
         async function loadEvents() {
             try {
-                // Näitame laadimisteate
                 document.getElementById('container').innerHTML = '<div class="status-message">Laen andmeid Kultuuriaknast...</div>';
                 
-                // Pärime HTML andmed kasutades proxy funktsiooni
                 const htmlText = await fetchWithProxy(KULTUURIAKEN_URL);
-                
-                // Parsime Kultuuriakna HTML koodi
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(htmlText, "text/html");
                 
-                // Otsime sündmuste elemente - LISATUD ROHKEM VÕIMALIKKE KLASSE (laiem otsing)
-                const rowSelectors = '.views-row, .event-item, article.node--type-event, .node--view-mode-teaser, .search-result-item, .card, .event-card, .event-row';
-                const rows = doc.querySelectorAll(rowSelectors);
+                // 1. TUVATUS: Kas leht ise teatab, et sündmusi pole?
+                const pageText = doc.body ? doc.body.innerText.toLowerCase() : '';
+                if (pageText.includes('ei leitud vasteid') || pageText.includes('otsingule ei leitud')) {
+                    document.getElementById('container').innerHTML = `<div class="status-message">Valitud perioodil ja filtritega ei leitud hetkel ühtegi sündmust.</div>`;
+                    return;
+                }
                 
-                // VEAOTSINGU ABIMEES: Kui ei leitud ühtegi kasti
+                // 2. TAVALINE OTSING: Otsime sündmuste elemente klasside järgi
+                const rowSelectors = '.views-row, .event-item, article.node--type-event, .node--view-mode-teaser, .search-result-item, .card, .event-card, .event-row';
+                let rows = Array.from(doc.querySelectorAll(rowSelectors));
+                
+                // 3. ÜLIM VARUPLAAN: Kui klasse ei leitud, otsime kõiki sündmuse linke ja võtame nende ümbrise!
                 if (rows.length === 0) {
-                    console.warn("DOM ei leidnud ühtegi sündmuse elementi! Kas Kultuuriaken muutis disaini, leht on tühi (URL-i filter) või proxy on blokeeritud?");
-                    console.log("Allalaaditud HTML sisu algus:", htmlText.substring(0, 1500));
-                    document.getElementById('container').innerHTML = `<div class="status-message">Hetkel otsitavaid sündmusi ei leitud.<br><span style="font-size:1rem; opacity:0.7;">(Vajuta F12 ja vaata Console vahelehte detailide jaoks)</span></div>`;
+                    const eventLinks = doc.querySelectorAll('a[href*="/syndmus/"], a[href*="/event/"]');
+                    const uniqueRows = new Set();
+                    eventLinks.forEach(link => {
+                        // Leiame lähima mõistliku suurusega kasti, mis linki ümbritseb
+                        const container = link.closest('article, li, div[class*="item"], div[class*="card"], div[class*="row"]');
+                        if (container && container.innerText.trim().length > 15) {
+                            uniqueRows.add(container);
+                        }
+                    });
+                    rows = Array.from(uniqueRows);
+                }
+                
+                // Kui isegi varuplaan ei toimi
+                if (rows.length === 0) {
+                    console.warn("DOM ei leidnud ühtegi sündmuse elementi. Kas nimekiri on tühi või laetakse varjatult (AJAX)?");
+                    document.getElementById('container').innerHTML = `<div class="status-message">Hetkel otsitavaid sündmusi ei leitud.<br><span style="font-size:1rem; opacity:0.7; display:block; margin-top:10px;">(Võimalik, et sündmused puuduvad valitud filtrites või leht kasutab varjatud laadimist)</span></div>`;
                     return;
                 }
 
-                const parsedData = Array.from(rows).map(row => {
-                    // Pealkiri (laiendatud otsing)
-                    const titleNode = row.querySelector('.views-field-title a, .node__title a, h2 a, h3 a, h2, h3, .title');
+                const parsedData = rows.map(row => {
+                    // Pealkiri
+                    const titleNode = row.querySelector('.views-field-title a, .node__title a, h2 a, h3 a, h2, h3, h4, .title');
                     const title = titleNode ? titleNode.innerText.trim() : '';
 
                     if (!title) return null;
@@ -319,22 +331,27 @@
                     // Pilt
                     const imgNode = row.querySelector('img');
                     let imgUrl = imgNode ? imgNode.getAttribute('src') : '';
-                    // Kui pildi link on suhteline (algab kaldkriipsuga), lisame domeeni
                     if (imgUrl && imgUrl.startsWith('/')) {
                         imgUrl = 'https://kultuuriaken.tartu.ee' + imgUrl;
                     }
 
-                    // Kuupäev ja aeg (laiendatud otsing)
+                    // Kuupäev ja aeg
                     const dateNode = row.querySelector('.views-field-field-event-date, .field--name-field-event-date, .event-date, .date, time');
-                    const dateText = dateNode ? dateNode.innerText.replace(/\s+/g, ' ').trim() : '';
+                    let dateText = dateNode ? dateNode.innerText.replace(/\s+/g, ' ').trim() : '';
+                    
+                    // Kui otsene klass puudub, proovime tekstist kuupäeva mustrit leida (nt "12. märts | 18:00")
+                    if (!dateText) {
+                        const dateMatch = row.innerText.match(/\d{1,2}\.\s*[a-zA-ZäöüõÄÖÜÕ]+\s*(\|\s*\d{2}:\d{2})?/);
+                        if (dateMatch) dateText = dateMatch[0];
+                    }
 
-                    // Asukoht (laiendatud otsing)
+                    // Asukoht
                     const locNode = row.querySelector('.views-field-field-place, .field--name-field-place, .event-location, .location');
                     let locText = locNode ? locNode.innerText.replace(/\s+/g, ' ').trim() : '';
                     if (!locText) locText = "Elva vald";
                     
-                    // Lühikirjeldus (laiendatud otsing)
-                    const descNode = row.querySelector('.views-field-body, .field--name-body, .event-description, .description');
+                    // Lühikirjeldus
+                    const descNode = row.querySelector('.views-field-body, .field--name-body, .event-description, .description, p');
                     const descText = descNode ? descNode.innerText.replace(/\s+/g, ' ').trim() : '';
 
                     return {
@@ -344,14 +361,14 @@
                         Koht: locText,
                         Kirjeldus: descText,
                         'Plakat (URL)': imgUrl,
-                        Piletilink: '' // Lingi eraldamine Kultuuriakna üldnimekirjast on keeruline
+                        Piletilink: '' // Lingi eraldamine on keeruline
                     };
-                }).filter(item => item !== null);
+                }).filter(item => item !== null && item.Nimi.length > 0);
 
                 if (parsedData.length > 0) {
                     renderEvents(parsedData);
                 } else {
-                    document.getElementById('container').innerHTML = `<div class="status-message">Sündmusi leiti, aga vigase pealkirjaga.</div>`;
+                    document.getElementById('container').innerHTML = `<div class="status-message">Sündmusi leiti, aga andmeid ei suudetud lugeda.</div>`;
                 }
 
             } catch (error) {
@@ -360,7 +377,7 @@
             }
         }
 
-        // Teleri automaatse kerimise (Auto-Scroll) loogika - TÄIUSTATUD SUJUV KERIMINE
+        // Teleri automaatse kerimise (Auto-Scroll) loogika
         let scrollPos = 0;
         let isScrolling = false;
         let scrollTimeout;
@@ -368,19 +385,15 @@
         function scrollLoop() {
             if (!isScrolling) return;
 
-            scrollPos += 0.8; // Kerimise kiirus (väiksem number = aeglasem)
+            scrollPos += 0.8; 
             window.scrollTo(0, scrollPos);
             
-            // Kontrollime, kas oleme jõudnud lehe lõppu
-            // -2 lisab väikese puhvri, et vältida arvutusvigu erinevatel ekraanidel
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) {
-                isScrolling = false; // Peatame kerimise tsükli
+                isScrolling = false; 
                 
-                // Ootame 3 sekundit lõpus enne üles kerimist
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     
-                    // Ootame, kuni smooth scroll üles jõuab (tavaliselt ~1-2 sek), siis alustame uuesti
                     setTimeout(() => {
                         scrollPos = 0;
                         isScrolling = true;
@@ -395,12 +408,10 @@
         }
 
         function startAutoScroll() {
-            // Peatame eelmise kerimise, kui see juhuslikult käib
             isScrolling = false;
             scrollPos = 0;
             window.scrollTo(0,0);
             
-            // Ootame 5 sekundit peale laadimist, enne kui kerima hakkame
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
                 isScrolling = true;
@@ -408,10 +419,8 @@
             }, 5000);
         }
 
-        // KÄIVITAMINE
         loadEvents();
         
-        // Iga 30 minuti tagant teeb lehele restardi, et laadida uued andmed
         setInterval(() => window.location.reload(), 30 * 60 * 1000);
 
     </script>
