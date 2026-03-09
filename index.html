@@ -10,214 +10,154 @@
 
     <style>
         :root {
-            --bg-color: #0b1016;
-            --card-bg: #131922;
-            --panel-bg: rgba(19, 25, 34, 0.92);
-            --text-main: #d7dee7;
-            --text-muted: #8e98a4;
-            --accent: #69aefc;
-            --border-soft: rgba(255,255,255,0.08);
-            --border-faint: rgba(255,255,255,0.05);
+            --bg-color: #0b0e14;
+            --card-bg: #141921;
+            --accent: #60a5fa;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255,255,255,0.06);
+            --header-h: 50px; /* VEELGI VÄIKSEM ÜLEMINE RIBA */
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background:
-                radial-gradient(circle at 70% 35%, rgba(74, 129, 255, 0.10), transparent 28%),
-                radial-gradient(circle at 30% 70%, rgba(255, 90, 90, 0.05), transparent 22%),
-                var(--bg-color);
+            background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
             overflow: hidden;
+            height: 100vh;
         }
 
+        /* 1. ÜLEMINE RIBA - KOMPAKTNE */
         header {
-            background: rgba(11, 16, 22, 0.88);
-            backdrop-filter: blur(8px);
-            padding: 8px 24px;
+            height: var(--header-h);
+            background: rgba(11, 14, 20, 0.95);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(105, 174, 252, 0.35);
+            padding: 0 25px;
+            border-bottom: 1px solid rgba(96, 165, 250, 0.3);
             position: fixed;
-            top: 0;
-            width: 100%;
-            height: 60px;
-            z-index: 100;
+            top: 0; width: 100%; z-index: 100;
         }
 
-        h1 {
-            margin: 0;
-            font-weight: 900;
-            font-size: 1.3rem;
-            letter-spacing: -0.01em;
-            text-transform: uppercase;
-            color: #ffffff;
-        }
-
-        .clock {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: -0.02em;
-        }
+        h1 { font-weight: 900; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+        .clock { font-size: 1.4rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
 
         .layout {
             display: flex;
-            height: calc(100vh - 60px);
-            margin-top: 60px;
-            padding: 15px;
-            gap: 15px;
+            height: calc(100vh - var(--header-h));
+            margin-top: var(--header-h);
+            padding: 12px;
+            gap: 12px;
         }
 
-        /* VASAK PANEEL - Väiksem font */
+        /* 2. VASAK PANEEL - VÄIKSEM FONT */
         .sidebar {
-            width: 30%;
-            background: rgba(19, 25, 34, 0.72);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid var(--border-faint);
-            overflow: hidden;
+            width: 25%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .sidebar-header {
-            padding: 12px 16px;
+            padding: 10px;
             background: rgba(255,255,255,0.02);
-            border-bottom: 1px solid var(--border-faint);
+            font-size: 0.7rem;
             font-weight: 800;
-            font-size: 0.8rem;
             text-transform: uppercase;
-            color: #dce5ef;
+            text-align: center;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .scroll-container {
-            flex: 1;
-            overflow-y: auto;
-            position: relative;
-            scrollbar-width: none;
-        }
-
+        .scroll-container { flex: 1; overflow-y: auto; scrollbar-width: none; }
         .scroll-container::-webkit-scrollbar { display: none; }
-
-        .scroll-content {
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        .scroll-content { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
 
         .list-item {
             background: rgba(255,255,255,0.02);
             padding: 8px;
-            border-radius: 12px;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             gap: 10px;
-            min-height: 80px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
         }
 
         .list-item.active {
-            background: rgba(105, 174, 252, 0.08);
-            border-color: rgba(105, 174, 252, 0.25);
+            background: rgba(96, 165, 250, 0.1);
+            border-color: rgba(96, 165, 250, 0.3);
+            transform: scale(1.02);
         }
 
         .list-thumb {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
+            width: 50px; height: 50px;
+            border-radius: 6px;
             object-fit: cover;
             flex-shrink: 0;
+            border: 1px solid var(--border-color);
         }
 
-        .list-text-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow: hidden;
-            min-width: 0;
-        }
+        .list-text-content { overflow: hidden; display: flex; flex-direction: column; gap: 1px; }
+        .list-date { font-size: 0.6rem; font-weight: 800; color: var(--accent); text-transform: uppercase; }
+        .list-title { font-size: 0.75rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-loc { font-size: 0.65rem; color: var(--text-muted); }
 
-        .list-date {
-            font-size: 0.65rem;
-            color: var(--accent);
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .list-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .list-loc {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-        }
-
-        /* PAREM PANEEL - Suuremad pildid, väiksem font */
+        /* 3. PAREM PANEEL - SUUREMAD PILDID */
         .featured {
-            width: 70%;
-            border-radius: 22px;
-            overflow: hidden;
+            width: 75%;
+            background: #000;
+            border-radius: 12px;
             position: relative;
-            border: 1px solid var(--border-faint);
-            background: #0c1219;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .feat-bg-blur {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            filter: blur(60px) brightness(0.2);
+            position: absolute; inset: 0;
+            filter: blur(50px) brightness(0.2);
             object-fit: cover;
             transform: scale(1.1);
+            width: 100%; height: 100%;
+            z-index: 1;
         }
 
         .feat-surface {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             z-index: 2;
-            padding: 30px;
-            background: linear-gradient(to top, rgba(11,16,22,0.96) 0%, rgba(11,16,22,0.85) 60%, rgba(11,16,22,0.6) 100%);
             display: flex;
-            gap: 30px;
-        }
-
-        .feat-main {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .feat-side {
-            width: 320px; /* Suurendatud küljepaneel pildi jaoks */
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            padding: 20px;
             gap: 20px;
+            background: linear-gradient(135deg, rgba(11,14,20,0.95) 0%, rgba(11,14,20,0.8) 100%);
         }
 
-        .feat-poster-wrap {
+        .feat-info {
+            flex: 1; /* Tekst võtab vähem ruumi */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .feat-poster-area {
+            flex: 1.6; /* Pilt võtab rohkem ruumi (ca 62%) */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* MAKSIMAALNE PLAKAT */
+        .feat-poster-main {
             width: 100%;
+            height: 85%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -225,92 +165,41 @@
 
         .feat-poster-main img {
             max-width: 100%;
-            max-height: 420px; /* Suurendatud pildi kõrgus */
+            max-height: 100%;
             object-fit: contain;
-            border-radius: 12px;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .feat-date {
-            color: var(--accent);
-            font-size: 0.85rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
+        .feat-date { font-size: 0.9rem; font-weight: 800; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; }
+        .feat-title { font-size: 1.6rem; font-weight: 900; line-height: 1.1; margin-bottom: 10px; color: #fff; }
+        .feat-loc { font-size: 1rem; color: #e2e8f0; font-weight: 600; margin-bottom: 15px; }
+        .feat-desc { font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; overflow: hidden; }
 
-        .feat-title {
-            font-size: 1.7rem; /* Vähendatud pealkiri */
-            margin: 0 0 10px 0;
-            font-weight: 900;
-            line-height: 1.1;
-            color: #ffffff;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            letter-spacing: -0.02em;
-        }
-
-        .feat-loc {
-            font-size: 0.9rem;
-            color: #eef3f8;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .feat-desc {
-            font-size: 0.88rem; /* Vähendatud kirjeldus */
-            line-height: 1.5;
-            opacity: 0.9;
-            color: #d4dbe4;
-            display: -webkit-box;
-            -webkit-line-clamp: 10;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        /* 4. VÄIKSEM QR-KAART */
+        .action-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .qr-card {
             background: rgba(255,255,255,0.03);
             padding: 8px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            border: 1px solid var(--accent);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
 
-        .qr-label {
-            font-size: 0.5rem;
-            font-weight: 800;
-            color: #d9e2eb;
-            text-transform: uppercase;
-            text-align: center;
-        }
+        .qr-label { font-size: 0.45rem; font-weight: 800; text-transform: uppercase; color: #fff; text-align: center; }
+        .qr-target { background: #fff; padding: 2px; border-radius: 3px; line-height: 0; }
 
-        .qr-target {
-            background: white;
-            padding: 3px;
-            border-radius: 4px;
-        }
-
-        .status-msg {
-            font-size: 2rem;
-            text-align: center;
-            margin-top: 35vh;
-            color: var(--text-muted);
-            width: 100%;
-            padding: 0 40px;
-        }
-
-        #featured-inner {
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.45s ease;
-        }
+        .status-msg { font-size: 1.5rem; text-align: center; margin-top: 40vh; color: var(--text-muted); width: 100%; }
+        #featured-inner { width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease; }
     </style>
 </head>
 <body>
@@ -320,7 +209,7 @@
     <div class="clock" id="clock">00:00</div>
 </header>
 
-<div id="loader" class="status-msg">Laen sündmusi...</div>
+<div id="loader" class="status-msg">Uuendan andmeid...</div>
 
 <div class="layout" id="main-ui" style="display:none;">
     <div class="sidebar">
@@ -337,219 +226,134 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
-    const DEFAULT_TARGET_URL = "https://kultuuriaken.tartu.ee/et/syndmused?regions=788";
     const DISPLAY_MS = 20000;
 
     let allEvents = [];
     let activeIdx = -1;
     let autoAdvanceTimer = null;
 
-    const PLACEHOLDER_IMG =
-        "data:image/svg+xml;charset=UTF-8," +
-        encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
-                <rect width="100%" height="100%" fill="#161b22"/>
-                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-                      fill="#58a6ff" font-family="Arial, sans-serif"
-                      font-size="56" font-weight="700">
-                    Kultuurisündmus
-                </text>
-            </svg>
-        `);
+    const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect width="100%" height="100%" fill="#141921"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#60a5fa" font-family="Arial" font-size="50" font-weight="700">Elva Kultuur</text></svg>');
 
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
-    }
-
-    function normalizeText(value) {
-        return String(value ?? "").replace(/\s+/g, " ").trim();
-    }
-
-    function truncate(text, max = 1200) {
-        const clean = normalizeText(text);
-        if (!clean) return "";
-        return clean.length > max ? clean.slice(0, max).trim() + "..." : clean;
-    }
-
-    function normalizeUrl(url) {
-        const value = normalizeText(url);
-        if (!value) return "";
-        if (/^https?:\/\//i.test(value)) return value;
-        if (value.startsWith("//")) return "https:" + value;
-        if (value.startsWith("/")) return "https://kultuuriaken.tartu.ee" + value;
-        return value;
-    }
-
-    function safeJsonParse(input) {
-        if (input == null) return null;
-        if (typeof input === "object") return input;
-        const text = String(input).trim();
-        if (!text) return null;
-        try { return JSON.parse(text); } catch (err) { return null; }
-    }
-
-    function extractEventsArray(data) {
-        if (Array.isArray(data)) return data;
-        if (Array.isArray(data?.events)) return data.events;
-        if (Array.isArray(data?.data)) return data.data;
-        return [];
-    }
-
+    function escapeHtml(v) { return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    
     function normalizeEvent(raw) {
-        if (!raw || typeof raw !== "object") return null;
-        const title = normalizeText(raw.title);
-        if (!title) return null;
-        const date = normalizeText(raw.date || "Täpsustamisel");
-        const loc = normalizeText(raw.loc || "Elva vald");
-        const desc = truncate(raw.desc || "");
-        const img = normalizeUrl(raw.img || "");
-        const url = normalizeUrl(raw.url || DEFAULT_TARGET_URL);
-        const startIso = normalizeText(raw.startIso || "");
-        return { title, date, loc, desc, img, url, startIso };
+        if (!raw || !raw.title) return null;
+        return {
+            title: String(raw.title).trim(),
+            date: String(raw.date || "Täpsustamisel").trim(),
+            loc: String(raw.loc || "Elva vald").trim(),
+            desc: String(raw.desc || "").trim(),
+            img: (raw.img && raw.img.length > 5) ? raw.img : "",
+            url: raw.url || "https://elvakultuur.ee",
+            startIso: raw.startIso || ""
+        };
     }
 
-    async function fetchWithTimeout(url, timeout = 12000) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), timeout);
-        try {
-            return await fetch(url, { method: "GET", cache: "no-store", signal: controller.signal });
-        } finally { clearTimeout(timer); }
-    }
-
-    async function fetchEventsRobustly() {
-        const encodedUrl = encodeURIComponent(SCRIPT_URL);
-        const attempts = [
-            { type: "direct", url: SCRIPT_URL },
-            { type: "allorigins", url: `https://api.allorigins.win/get?url=${encodedUrl}` }
+    async function fetchEvents() {
+        const proxies = [
+            SCRIPT_URL,
+            `https://api.allorigins.win/get?url=${encodeURIComponent(SCRIPT_URL)}&cachebuster=${Date.now()}`
         ];
 
-        for (const attempt of attempts) {
+        for (const url of proxies) {
             try {
-                const res = await fetchWithTimeout(attempt.url, 12000);
+                const res = await fetch(url, { cache: 'no-store' });
                 if (!res.ok) continue;
-                let body = attempt.type === "allorigins" ? await res.json() : safeJsonParse(await res.text());
-                let data = attempt.type === "allorigins" ? safeJsonParse(body?.contents) : body;
+                let data = await (url.includes('allorigins') ? res.json() : res.json());
+                if (url.includes('allorigins')) data = JSON.parse(data.contents);
                 
-                const events = extractEventsArray(data)
-                    .map(normalizeEvent)
-                    .filter(Boolean)
-                    .sort((a, b) => (a.startIso && b.startIso) ? new Date(a.startIso) - new Date(b.startIso) : 0);
-
-                if (events.length > 0) return events;
-            } catch (err) {}
+                const list = (Array.isArray(data) ? data : (data.events || data.data || []))
+                    .map(normalizeEvent).filter(Boolean);
+                
+                if (list.length > 0) return list;
+            } catch (e) { console.warn("Laadimine ebaõnnestus allikast:", url); }
         }
-        throw new Error("Viga andmete laadimisel.");
+        throw new Error("Andmeid ei leitud.");
     }
 
     function updateClock() {
-        document.getElementById("clock").textContent = new Date().toLocaleTimeString("et-EE", {
-            hour: "2-digit", minute: "2-digit"
-        });
+        document.getElementById("clock").textContent = new Date().toLocaleTimeString("et-EE", { hour: "2-digit", minute: "2-digit" });
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateClock, 1000); updateClock();
 
     function renderList() {
         const list = document.getElementById("scroll-list");
-        list.innerHTML = "";
-        allEvents.forEach((ev, i) => {
-            const item = document.createElement("div");
-            item.className = "list-item";
-            item.id = `ev-${i}`;
-            const thumb = document.createElement("img");
-            thumb.className = "list-thumb";
-            thumb.src = ev.img || PLACEHOLDER_IMG;
-            thumb.onerror = function() { this.src = PLACEHOLDER_IMG; };
-            const textWrap = `<div class="list-text-content"><div class="list-date">${escapeHtml(ev.date)}</div><div class="list-title">${escapeHtml(ev.title)}</div><div class="list-loc">📍 ${escapeHtml(ev.loc)}</div></div>`;
-            item.appendChild(thumb);
-            item.insertAdjacentHTML('beforeend', textWrap);
-            list.appendChild(item);
-        });
+        list.innerHTML = allEvents.map((ev, i) => `
+            <div class="list-item" id="ev-${i}">
+                <img src="${ev.img || PLACEHOLDER}" class="list-thumb" onerror="this.src='${PLACEHOLDER}'">
+                <div class="list-text-content">
+                    <div class="list-date">${escapeHtml(ev.date)}</div>
+                    <div class="list-title">${escapeHtml(ev.title)}</div>
+                    <div class="list-loc">📍 ${escapeHtml(ev.loc)}</div>
+                </div>
+            </div>
+        `).join('');
     }
 
     function switchFeatured(idx) {
         if (idx === activeIdx || !allEvents[idx]) return;
         activeIdx = idx;
         const ev = allEvents[idx];
+
         document.querySelectorAll(".list-item").forEach(el => el.classList.remove("active"));
-        document.getElementById(`ev-${idx}`)?.classList.add("active");
+        document.getElementById(`ev-${idx}`)?.classList.add('active');
+
         const inner = document.getElementById("featured-inner");
         inner.style.opacity = 0;
 
         setTimeout(() => {
-            const poster = escapeHtml(ev.img || PLACEHOLDER_IMG);
+            const poster = ev.img || PLACEHOLDER;
             inner.innerHTML = `
-                <img src="${poster}" class="feat-bg-blur" alt="">
+                <img src="${poster}" class="feat-bg-blur" onerror="this.src='${PLACEHOLDER}'">
                 <div class="feat-surface">
-                    <div class="feat-main">
+                    <div class="feat-info">
                         <div class="feat-date">${escapeHtml(ev.date)}</div>
                         <h2 class="feat-title">${escapeHtml(ev.title)}</h2>
                         <div class="feat-loc">📍 ${escapeHtml(ev.loc)}</div>
-                        <div class="feat-desc">${escapeHtml(ev.desc || "Vaata lisainfot QR-koodist.")}</div>
+                        <div class="feat-desc">${escapeHtml(ev.desc || "Lisainfo saamiseks skaneeri QR-kood.")}</div>
                     </div>
-                    <div class="feat-side">
-                        <div class="feat-poster-wrap">
-                            <div class="feat-poster-main">
-                                <img src="${poster}" alt="${escapeHtml(ev.title)}">
-                            </div>
+                    <div class="feat-poster-area">
+                        <div class="feat-poster-main">
+                            <img src="${poster}" alt="" onerror="this.src='${PLACEHOLDER}'">
                         </div>
-                        <div class="qr-card">
-                            <div class="qr-label">INFO JA<br>PILETID</div>
-                            <div class="qr-target" id="qr-box"></div>
+                        <div class="action-block">
+                            <div class="qr-card">
+                                <div class="qr-label">INFO JA PILETID</div>
+                                <div class="qr-target" id="qr-box"></div>
+                            </div>
                         </div>
                     </div>
                 </div>`;
 
-            inner.querySelectorAll("img").forEach(img => {
-                img.onerror = function() { this.src = PLACEHOLDER_IMG; };
-            });
-
             new QRCode(document.getElementById("qr-box"), {
-                text: ev.url || DEFAULT_TARGET_URL,
-                width: 60, height: 60, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M
+                text: ev.url, width: 55, height: 55, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.M
             });
             inner.style.opacity = 1;
         }, 250);
     }
 
-    function centerActiveItem(idx) {
+    function autoCycle() {
+        const next = (activeIdx + 1) % allEvents.length;
+        switchFeatured(next);
         const container = document.getElementById("scroll-container");
-        const item = document.getElementById(`ev-${idx}`);
-        if (!container || !item) return;
-        const targetTop = item.offsetTop - (container.clientHeight / 2) + (item.offsetHeight / 2);
-        container.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
-    }
-
-    function startAutoAdvance() {
-        if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
-        autoAdvanceTimer = setInterval(() => {
-            const nextIdx = (activeIdx + 1) % allEvents.length;
-            switchFeatured(nextIdx);
-            centerActiveItem(nextIdx);
-        }, DISPLAY_MS);
+        const item = document.getElementById(`ev-${next}`);
+        if (item) container.scrollTo({ top: item.offsetTop - 100, behavior: "smooth" });
     }
 
     async function init() {
-        const loader = document.getElementById("loader");
-        const mainUi = document.getElementById("main-ui");
         try {
-            allEvents = await fetchEventsRobustly();
+            allEvents = await fetchEvents();
             if (allEvents.length > 0) {
-                loader.style.display = "none";
-                mainUi.style.display = "flex";
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("main-ui").style.display = "flex";
                 renderList();
                 switchFeatured(0);
-                startAutoAdvance();
+                setInterval(autoCycle, DISPLAY_MS);
             } else {
-                loader.textContent = "Sündmusi ei leitud.";
+                document.getElementById("loader").textContent = "Sündmusi ei leitud.";
             }
         } catch (e) {
-            loader.innerHTML = `<span style="color:#ff6b6b">Viga laadimisel.</span>`;
+            document.getElementById("loader").innerHTML = `<span style="color:#f87171">Andmete viga.</span><br><small>${e.message}</small>`;
         }
     }
 
