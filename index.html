@@ -15,8 +15,8 @@
             --text: #ffffff;
             --muted: #64748b;
             --border: rgba(255,255,255,0.06);
-            --header-h: 60px; /* Madalam päis */
-            --ticker-h: 120px; /* Madalam alumine rida */
+            --header-h: 60px; 
+            --ticker-h: 100px; /* VEELGI MADALAM ALUMINE RIDA */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,7 +42,7 @@
         }
 
         .header-title {
-            font-size: 1rem; /* Väiksem kiri */
+            font-size: 1rem;
             font-weight: 300;
             text-transform: uppercase;
             letter-spacing: 3px;
@@ -104,7 +104,7 @@
         }
 
         .hero-title {
-            font-size: 1.8rem; /* Vähendatud, et mahuks paremini */
+            font-size: 1.8rem;
             font-weight: 900;
             line-height: 1.1;
             margin-bottom: 2px;
@@ -135,12 +135,14 @@
         }
 
         .hero-desc {
-            font-size: 1rem; /* Kompaktsem tekst */
+            font-size: 1rem;
             line-height: 1.5;
             color: #cbd5e1;
             position: absolute;
             top: 0;
             width: 100%;
+            /* Tagab, et kerimisel ei jääks tekst poolikuks */
+            padding-bottom: 40px; 
         }
 
         /* VISUAAL-ALA */
@@ -160,12 +162,13 @@
             border-radius: 8px;
         }
 
-        /* ALUMINE RIDA */
+        /* ALUMINE RIDA - PUHTAM JA MADALAM */
         .bottom-section {
             height: var(--ticker-h);
             display: flex;
             gap: 15px;
-            padding: 0 30px 15px 30px;
+            padding: 0 30px 10px 30px;
+            align-items: center;
         }
 
         .ticker-area {
@@ -173,15 +176,8 @@
             display: flex;
             flex-direction: column;
             min-width: 0;
-        }
-
-        .ticker-title {
-            font-size: 0.65rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 8px;
-            letter-spacing: 1.5px;
+            height: 100%;
+            justify-content: center;
         }
 
         .ticker-scroll {
@@ -189,13 +185,14 @@
             gap: 12px;
             overflow-x: auto;
             scrollbar-width: none;
-            height: 100%;
+            height: 80px;
+            align-items: center;
         }
         .ticker-scroll::-webkit-scrollbar { display: none; }
 
         .event-card {
             flex: 0 0 250px;
-            height: 75px;
+            height: 70px; /* Veidi madalam kaart */
             background: rgba(255,255,255,0.02);
             border: 1px solid var(--border);
             border-radius: 10px;
@@ -211,8 +208,8 @@
         }
 
         .event-card-img {
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
             border-radius: 6px;
             object-fit: cover;
         }
@@ -227,24 +224,26 @@
 
         /* QR-KOOD ALUMISEL RIBAL */
         .qr-area {
-            width: 210px;
+            width: 200px;
+            height: 80px;
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--border);
             border-radius: 12px;
             display: flex;
             align-items: center;
-            padding: 12px;
-            gap: 12px;
+            padding: 10px;
+            gap: 10px;
             flex-shrink: 0;
         }
 
         .qr-text {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 800;
             text-transform: uppercase;
             line-height: 1.2;
             color: #fff;
             text-align: right;
+            flex: 1;
         }
 
         .qr-code-box {
@@ -267,11 +266,12 @@
             font-size: 0.9rem;
         }
 
+        /* KERIMISANIMATSIOON - kohandatud 30 sekundile */
         @keyframes scrollDescription {
             0% { transform: translateY(0); }
-            15% { transform: translateY(0); }
-            85% { transform: translateY(var(--scroll-dist)); }
-            100% { transform: translateY(var(--scroll-dist)); }
+            10% { transform: translateY(0); } /* Paus alguses */
+            90% { transform: translateY(var(--scroll-dist)); } /* Kerib lõpuni */
+            100% { transform: translateY(var(--scroll-dist)); } /* Paus lõpus */
         }
     </style>
 </head>
@@ -291,7 +291,7 @@
 
     <div class="bottom-section">
         <div class="ticker-area">
-            <h2 class="ticker-title">Sündmused vallas</h2>
+            <!-- Eemaldatud korduv pealkiri sündmuste kohta -->
             <div class="ticker-scroll" id="ticker-scroll"></div>
         </div>
         
@@ -304,7 +304,7 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
-    const ROTATE_INTERVAL = 18000;
+    const ROTATE_INTERVAL = 30000; // Iga esiletõstmine kestab täpselt 30 sekundit
     const PLACEHOLDER = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#05080a"/><text x="50%" y="50%" font-family="Arial" font-size="40" fill="#1d71d4" text-anchor="middle">ELVA</text></svg>')}`;
 
     let events = [];
@@ -389,15 +389,17 @@
             const qrTarget = document.getElementById("qr-target");
             qrTarget.innerHTML = "";
             new QRCode(qrTarget, {
-                text: ev.url, width: 70, height: 70, colorDark : "#000", colorLight : "#fff", correctLevel : QRCode.CorrectLevel.H
+                text: ev.url, width: 65, height: 65, colorDark : "#000", colorLight : "#fff", correctLevel : QRCode.CorrectLevel.H
             });
 
+            // Arvuta kerimine vastavalt teksti tegelikule pikkusele
             const desc = document.getElementById('hero-desc');
             const container = desc.parentElement;
             const scrollDist = container.clientHeight - desc.scrollHeight;
             
             if (scrollDist < 0) {
                 desc.style.setProperty('--scroll-dist', `${scrollDist}px`);
+                // Animatsioon kestab täpselt ROTATE_INTERVAL aja
                 desc.style.animation = `scrollDescription ${ROTATE_INTERVAL}ms linear infinite`;
             }
 
@@ -411,6 +413,7 @@
     }
 
     loadData();
+    // Värskendame andmeid automaatselt iga 30 minuti järel
     setInterval(() => window.location.reload(), 30 * 60 * 1000);
 </script>
 </body>
