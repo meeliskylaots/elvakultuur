@@ -16,7 +16,7 @@
             --muted: #64748b;
             --border: rgba(255,255,255,0.06);
             --header-h: 70px;
-            --ticker-h: 130px;
+            --ticker-h: 140px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,7 +63,7 @@
             min-height: 0;
         }
 
-        /* HERO SEKTISIOON - PARANDATUD PAIGUTUS */
+        /* HERO SEKTSIOON */
         .hero {
             flex: 1;
             background: rgba(255, 255, 255, 0.02);
@@ -80,19 +80,19 @@
             transition: opacity 0.5s ease;
         }
 
-        /* INFO-ALA (Vasak pool) */
         .hero-info {
-            flex: 1.2; /* Rohkem ruumi tekstile */
+            flex: 1;
             padding: 40px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Jaotab elemendid ühtlaselt */
+            min-width: 0;
         }
 
         .hero-meta-top {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            height: 100%;
         }
 
         .hero-date {
@@ -117,7 +117,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .hero-loc::before {
             content: "";
@@ -127,70 +127,52 @@
             border-radius: 50%;
         }
 
-        .hero-desc {
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #cbd5e1;
-            display: -webkit-box;
-            -webkit-line-clamp: 5;
-            -webkit-box-orient: vertical;
+        .hero-desc-container {
+            flex: 1;
             overflow: hidden;
-            margin-bottom: 20px;
+            position: relative;
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
         }
 
-        /* QR-KOOD NÜÜD INFO-ALA ALL */
-        .qr-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255,255,255,0.03);
-            padding: 12px 18px;
-            border-radius: 12px;
-            width: fit-content;
-            border: 1px solid var(--border);
+        .hero-desc {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            position: absolute;
+            top: 0;
+            width: 100%;
         }
 
-        .qr-text {
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            line-height: 1.2;
-            color: var(--muted);
-        }
-
-        .qr-code-box {
-            background: #fff;
-            padding: 4px;
-            border-radius: 6px;
-            display: flex;
-        }
-
-        /* VISUAAL-ALA (Parem pool) */
+        /* VISUAAL-ALA - FIX: CONTAIN */
         .hero-visual {
-            flex: 0.8;
+            flex: 1;
             padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .hero-image-container {
-            width: 100%;
-            height: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.2);
         }
 
         .hero-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* NÄITAB TERVET PILTI */
+            border-radius: 10px;
         }
 
-        /* ALUMINE RIDA */
-        .ticker-section {
+        /* ALUMINE RIDA KOOS QR-KOODIGA */
+        .bottom-section {
             height: var(--ticker-h);
+            display: flex;
+            gap: 20px;
+            padding: 0 40px 20px 40px;
+        }
+
+        .ticker-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
         }
 
         .ticker-title {
@@ -207,11 +189,12 @@
             gap: 15px;
             overflow-x: auto;
             scrollbar-width: none;
+            height: 100%;
         }
         .ticker-scroll::-webkit-scrollbar { display: none; }
 
         .event-card {
-            flex: 0 0 300px;
+            flex: 0 0 280px;
             height: 85px;
             background: rgba(255,255,255,0.02);
             border: 1px solid var(--border);
@@ -242,6 +225,35 @@
         .event-card-date { font-size: 0.6rem; font-weight: 800; color: var(--elva-blue); }
         .event-card-title { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* QR-KOOD ALUMISEL RIBAL */
+        .qr-area {
+            width: 240px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .qr-text {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 1.2;
+            color: #fff;
+            text-align: right;
+        }
+
+        .qr-code-box {
+            background: #fff;
+            padding: 5px;
+            border-radius: 6px;
+            display: flex;
+        }
+
         .loader {
             position: fixed;
             inset: 0;
@@ -252,6 +264,13 @@
             z-index: 200;
             font-weight: 200;
             letter-spacing: 8px;
+        }
+
+        @keyframes scrollDescription {
+            0% { transform: translateY(0); }
+            15% { transform: translateY(0); }
+            85% { transform: translateY(var(--scroll-dist)); }
+            100% { transform: translateY(var(--scroll-dist)); }
         }
     </style>
 </head>
@@ -269,10 +288,17 @@
         <div id="hero-inner"></div>
     </section>
 
-    <section class="ticker-section">
-        <h2 class="ticker-title">Sündmused vallas</h2>
-        <div class="ticker-scroll" id="ticker-scroll"></div>
-    </section>
+    <div class="bottom-section">
+        <div class="ticker-area">
+            <h2 class="ticker-title">Sündmused vallas</h2>
+            <div class="ticker-scroll" id="ticker-scroll"></div>
+        </div>
+        
+        <div class="qr-area">
+            <div class="qr-text">Loe lähemalt<br>ja osta pilet</div>
+            <div class="qr-code-box" id="qr-target"></div>
+        </div>
+    </div>
 </main>
 
 <script>
@@ -349,22 +375,33 @@
                         <div class="hero-date">${ev.date}</div>
                         <h2 class="hero-title">${ev.title}</h2>
                         <div class="hero-loc">${ev.loc}</div>
-                        <p class="hero-desc">${ev.desc}</p>
-                    </div>
-                    <div class="qr-section">
-                        <div class="qr-text">Loe lähemalt ja<br>osta pilet</div>
-                        <div class="qr-code-box" id="qr-target"></div>
+                        <div class="hero-desc-container">
+                            <div class="hero-desc" id="hero-desc">${ev.desc}</div>
+                        </div>
                     </div>
                 </div>
                 <div class="hero-visual">
-                    <div class="hero-image-container">
-                        <img src="${ev.img}" class="hero-image" onerror="this.src='${PLACEHOLDER}'">
-                    </div>
+                    <img src="${ev.img}" class="hero-image" onerror="this.src='${PLACEHOLDER}'">
                 </div>
             `;
-            new QRCode(document.getElementById("qr-target"), {
-                text: ev.url, width: 60, height: 60, colorDark : "#000", colorLight : "#fff", correctLevel : QRCode.CorrectLevel.H
+            
+            // Uuenda QR koodi alumisel ribal
+            const qrTarget = document.getElementById("qr-target");
+            qrTarget.innerHTML = "";
+            new QRCode(qrTarget, {
+                text: ev.url, width: 75, height: 75, colorDark : "#000", colorLight : "#fff", correctLevel : QRCode.CorrectLevel.H
             });
+
+            // Arvuta kerimine
+            const desc = document.getElementById('hero-desc');
+            const container = desc.parentElement;
+            const scrollDist = container.clientHeight - desc.scrollHeight;
+            
+            if (scrollDist < 0) {
+                desc.style.setProperty('--scroll-dist', `${scrollDist}px`);
+                desc.style.animation = `scrollDescription ${ROTATE_INTERVAL}ms linear infinite`;
+            }
+
             inner.style.opacity = 1;
         }, 300);
     }
