@@ -11,12 +11,14 @@
     <style>
         :root {
             --elva-blue: #1d71d4;
-            --bg: #010204;
+            --elva-blue-rgb: 29, 113, 212;
+            --bg: #05070a;
+            --card-bg: rgba(255, 255, 255, 0.05);
             --text: #ffffff;
-            --muted: #64748b;
-            --border: rgba(255,255,255,0.06);
-            --header-h: 70px;
-            --ticker-h: 120px;
+            --muted: #94a3b8;
+            --border: rgba(255,255,255,0.1);
+            --header-h: 90px;
+            --ticker-h: 130px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,7 +26,6 @@
         body {
             font-family: 'Montserrat', sans-serif;
             background: var(--bg);
-            background-image: radial-gradient(circle at 20% 0%, rgba(29, 113, 212, 0.05), transparent 40%);
             color: var(--text);
             overflow: hidden;
             height: 100vh;
@@ -32,203 +33,264 @@
             flex-direction: column;
         }
 
+        /* Ambient Background Effect */
+        #ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            filter: blur(60px) brightness(0.3);
+            transition: background-image 1.5s ease-in-out;
+            transform: scale(1.1);
+        }
+
         header {
             height: var(--header-h);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 40px;
-            border-bottom: 1px solid var(--border);
+            padding: 0 50px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
             flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .elva-logo-stub {
+            width: 50px;
+            height: 50px;
+            background: var(--elva-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px rgba(var(--elva-blue-rgb), 0.4);
         }
 
         .header-title {
-            font-size: 1.2rem;
-            font-weight: 300;
+            font-size: 1.4rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            text-align: right;
+        }
+
+        .clock-box {
+            display: flex;
+            flex-direction: column;
         }
 
         .clock {
-            font-size: 1.8rem;
-            font-weight: 700;
-            opacity: 0.9;
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .date-today {
+            font-size: 0.9rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
 
         .app-content {
             flex: 1;
-            padding: 20px 40px;
+            padding: 20px 50px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 30px;
             min-height: 0;
+            z-index: 5;
         }
 
         .hero {
             flex: 1;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
             overflow: hidden;
             border: 1px solid var(--border);
             min-height: 0;
             position: relative;
             display: flex;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .progress-bar {
             position: absolute;
             top: 0;
             left: 0;
-            height: 5px;
+            height: 6px;
             background: var(--elva-blue);
             width: 0;
-            z-index: 10;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(var(--elva-blue-rgb), 0.6);
         }
 
         #hero-inner {
             display: flex;
             width: 100%;
             height: 100%;
-            transition: opacity 0.5s ease;
-            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hero-info {
-            flex: 1.2;
-            padding: 40px;
+            flex: 1.1;
+            padding: 60px;
             display: flex;
             flex-direction: column;
             min-width: 0;
+            justify-content: center;
         }
 
-        .hero-meta-top {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            height: 100%;
-        }
-
-        .hero-date {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--elva-blue);
+        .hero-date-tag {
+            display: inline-block;
+            background: rgba(var(--elva-blue-rgb), 0.2);
+            color: #60a5fa;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            align-self: flex-start;
+            border: 1px solid rgba(var(--elva-blue-rgb), 0.3);
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
         .hero-title {
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 5px;
+            line-height: 1;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .hero-loc {
-            font-size: 1.3rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 600;
             color: #4ade80;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .hero-loc::before {
-            content: "📍";
-            font-size: 1.1rem;
+            gap: 12px;
+            margin-bottom: 30px;
         }
 
         .hero-desc-container {
             flex: 1;
             overflow: hidden;
             position: relative;
-            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
         }
 
         .hero-desc {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            color: #cbd5e1;
+            font-size: 1.3rem;
+            line-height: 1.7;
+            color: #e2e8f0;
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            padding-bottom: 80px;
-            will-change: transform;
+            padding-bottom: 100px;
             white-space: pre-wrap;
         }
 
         .hero-visual {
-            flex: 1;
-            padding: 20px;
+            flex: 0.9;
+            position: relative;
+            padding: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.2);
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .hero-image {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            border-radius: 12px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
         }
 
         .bottom-section {
             height: var(--ticker-h);
             display: flex;
-            gap: 20px;
-            padding: 0 40px 20px 40px;
+            gap: 25px;
+            padding-bottom: 20px;
             align-items: center;
             flex-shrink: 0;
         }
 
         .ticker-area {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
             height: 100%;
-            justify-content: center;
+            display: flex;
+            align-items: center;
+            min-width: 0;
         }
 
         .ticker-scroll {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             overflow-x: auto;
             scrollbar-width: none;
-            height: 100px;
-            align-items: center;
+            padding: 10px 0;
             scroll-behavior: smooth;
         }
 
         .ticker-scroll::-webkit-scrollbar { display: none; }
 
         .event-card {
-            flex: 0 0 320px;
-            height: 90px;
-            background: rgba(255,255,255,0.03);
+            flex: 0 0 340px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border);
-            border-radius: 15px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            padding: 10px;
+            padding: 12px;
             gap: 15px;
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
+            backdrop-filter: blur(5px);
         }
 
         .event-card.active {
             border-color: var(--elva-blue);
-            background: rgba(29, 113, 212, 0.15);
-            transform: scale(1.02);
+            background: rgba(var(--elva-blue-rgb), 0.2);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         .event-card-img {
-            width: 70px;
-            height: 70px;
-            border-radius: 8px;
+            width: 76px;
+            height: 76px;
+            border-radius: 12px;
             object-fit: cover;
             flex-shrink: 0;
         }
@@ -236,23 +298,18 @@
         .event-card-info {
             flex: 1;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
         }
 
         .event-card-date {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             font-weight: 800;
-            color: var(--elva-blue);
+            color: #60a5fa;
             text-transform: uppercase;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            margin-bottom: 4px;
         }
 
         .event-card-title {
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 700;
             white-space: nowrap;
             overflow: hidden;
@@ -261,23 +318,24 @@
         }
 
         .qr-area {
-            width: 240px;
-            height: 100px;
-            background: rgba(255,255,255,0.04);
+            width: 280px;
+            height: 110px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            border-radius: 18px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
-            padding: 15px;
-            gap: 15px;
+            padding: 15px 20px;
+            gap: 20px;
             flex-shrink: 0;
         }
 
         .qr-text {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: 800;
             text-transform: uppercase;
-            line-height: 1.3;
+            line-height: 1.4;
             color: #fff;
             text-align: right;
             flex: 1;
@@ -285,11 +343,11 @@
 
         .qr-code-box {
             background: #fff;
-            padding: 5px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 12px;
             display: flex;
-            min-width: 75px;
-            min-height: 75px;
+            min-width: 80px;
+            min-height: 80px;
             align-items: center;
             justify-content: center;
         }
@@ -298,22 +356,32 @@
             position: fixed;
             inset: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: var(--bg);
-            z-index: 200;
+            z-index: 1000;
+            gap: 20px;
+        }
+
+        .loader-text {
             font-weight: 200;
-            letter-spacing: 10px;
-            font-size: 1.2rem;
+            letter-spacing: 15px;
+            font-size: 1.5rem;
             color: #fff;
-            text-align: center;
-            padding: 40px;
+            margin-left: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         @keyframes scrollDescription {
             0% { transform: translateY(0); }
-            10% { transform: translateY(0); }
-            90% { transform: translateY(var(--scroll-dist)); }
+            15% { transform: translateY(0); }
+            85% { transform: translateY(var(--scroll-dist)); }
             100% { transform: translateY(var(--scroll-dist)); }
         }
 
@@ -321,21 +389,45 @@
             0% { width: 0; }
             100% { width: 100%; }
         }
+
+        .fade-in { animation: fadeIn 0.8s forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* SVG Icon for location */
+        .icon-pin { width: 1.2rem; height: 1.2rem; fill: currentColor; }
     </style>
 </head>
 <body>
 
-<div id="loader" class="loader">ELVA KULTUURIEKRAAN</div>
+<div id="ambient-bg"></div>
+
+<div id="loader" class="loader">
+    <div class="elva-logo-stub">E</div>
+    <div class="loader-text">KULTUURIEKRAAN</div>
+</div>
 
 <header>
-    <h1 class="header-title">Sündmused Elva vallas</h1>
-    <div class="clock" id="clock">00:00</div>
+    <div class="header-left">
+        <div class="elva-logo-stub">E</div>
+        <h1 class="header-title">Elva Vald</h1>
+    </div>
+    <div class="header-right">
+        <div class="clock-box">
+            <div class="clock" id="clock">00:00</div>
+            <div class="date-today" id="today-date">...</div>
+        </div>
+    </div>
 </header>
 
-<main class="app-content" id="app-main" style="display:none;">
+<main class="app-content" id="app-main" style="visibility: hidden;">
     <section class="hero">
         <div class="progress-bar" id="progress-bar"></div>
-        <div id="hero-inner"></div>
+        <div id="hero-inner">
+            <!-- Content injected here -->
+        </div>
     </section>
 
     <div class="bottom-section">
@@ -352,18 +444,22 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
-    const ROTATE_INTERVAL = 30000;
-    const PLACEHOLDER = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#05080a"/><text x="50%" y="50%" font-family="Arial" font-size="40" fill="#1d71d4" text-anchor="middle">ELVA</text></svg>')}`;
+    const ROTATE_INTERVAL = 25000;
+    const PLACEHOLDER = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#0a0c10"/><text x="50%" y="50%" font-family="Arial" font-size="40" fill="#1d71d4" text-anchor="middle">ELVA</text></svg>')}`;
 
     let events = [];
     let currentIndex = 0;
     let rotateHandle = null;
 
     function updateClock() {
-        document.getElementById('clock').textContent = new Date().toLocaleTimeString('et-EE', {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('et-EE', {
             hour: '2-digit',
             minute: '2-digit'
         });
+        
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        document.getElementById('today-date').textContent = now.toLocaleDateString('et-EE', options);
     }
 
     setInterval(updateClock, 1000);
@@ -383,96 +479,65 @@
         try {
             const d = new Date(isoString);
             if (isNaN(d.getTime())) return fallback;
-
             const days = ['Pühapäev', 'Esmaspäev', 'Teisipäev', 'Kolmapäev', 'Neljapäev', 'Reede', 'Laupäev'];
             const months = ['jaanuar', 'veebruar', 'märts', 'aprill', 'mai', 'juuni', 'juuli', 'august', 'september', 'oktoober', 'november', 'detsember'];
-
             const hours = d.getHours().toString().padStart(2, '0');
             const minutes = d.getMinutes().toString().padStart(2, '0');
-
-            return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()} | kell ${hours}:${minutes}`;
+            return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]} | kell ${hours}:${minutes}`;
         } catch (e) {
             return fallback;
         }
     }
 
-    function cleanLocation(text) {
-        if (!text) return "Elva vald";
-        return String(text)
-            .replace(/,?\s*,/g, ", ")
-            .replace(/\s+/g, " ")
-            .replace(/^,\s*|,\s*$/g, "")
-            .trim() || "Elva vald";
-    }
-
     async function loadData() {
         const loader = document.getElementById('loader');
-
         try {
             const ts = Date.now();
-            const url = `${SCRIPT_URL}?format=json&refresh=1&t=${ts}`;
-
+            const url = `${SCRIPT_URL}?format=json&t=${ts}`;
             const res = await fetch(url, { cache: 'no-store' });
-            const text = await res.text();
+            const data = await res.json();
 
-            let data;
-            try {
-                data = JSON.parse(text);
-            } catch (parseErr) {
-                throw new Error("Backend ei tagastanud JSON-i");
-            }
-
-            if (!data.ok) {
-                throw new Error(data.error || "Backend tagastas vea");
-            }
-
-            const raw = Array.isArray(data.events) ? data.events : [];
-
-            if (raw.length > 0) {
-                events = raw
+            if (data.ok && Array.isArray(data.events) && data.events.length > 0) {
+                events = data.events
                     .filter(e => e && e.title)
                     .map(e => ({
                         title: e.title,
                         date: e.dateText || formatEstonianDate(e.startIso, e.date || "KUUPÄEV TÄPSUSTAMISEL"),
-                        loc: cleanLocation(e.loc || e.asutus),
+                        loc: e.loc || e.asutus || "Elva vald",
                         desc: e.desc || e.description || "Täpsem info Elva valla sündmustekalendris.",
                         img: e.img || e.pilt || PLACEHOLDER,
                         url: e.url || "https://elva.ee"
                     }));
 
-                loader.style.display = 'none';
-                document.getElementById('app-main').style.display = 'flex';
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+                
+                document.getElementById('app-main').style.visibility = 'visible';
                 renderTicker();
                 showEvent(0);
 
                 if (rotateHandle) clearInterval(rotateHandle);
                 rotateHandle = setInterval(nextEvent, ROTATE_INTERVAL);
             } else {
-                loader.textContent = "SÜNDMUSI EI LEITUD";
+                document.querySelector('.loader-text').textContent = "ÜHTEGI SÜNDMUST EI LEITUD";
             }
         } catch (err) {
             console.error("Laadimisviga:", err);
-            loader.textContent = "VIGA ANDMETE LAADIMISEL";
+            document.querySelector('.loader-text').textContent = "SIDEVIGA";
         }
     }
 
     function renderTicker() {
-        document.getElementById('ticker-scroll').innerHTML = events.map((ev, i) => `
+        const ticker = document.getElementById('ticker-scroll');
+        ticker.innerHTML = events.map((ev, i) => `
             <div class="event-card" id="card-${i}" onclick="showEvent(${i})">
                 <img src="${escapeHtml(ev.img)}" class="event-card-img" onerror="this.src='${PLACEHOLDER}'">
                 <div class="event-card-info">
-                    <div class="event-card-date">${escapeHtml(String(ev.date).split('|')[0].trim())}</div>
+                    <div class="event-card-date">${escapeHtml(ev.date.split('|')[0].trim())}</div>
                     <div class="event-card-title">${escapeHtml(ev.title)}</div>
                 </div>
             </div>
         `).join('');
-    }
-
-    function centerActiveCard(card) {
-        const ticker = document.getElementById('ticker-scroll');
-        if (!card || !ticker) return;
-        const targetLeft = card.offsetLeft - (ticker.clientWidth / 2) + (card.clientWidth / 2);
-        ticker.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
     }
 
     function showEvent(index) {
@@ -480,63 +545,74 @@
         const ev = events[index];
         const inner = document.getElementById('hero-inner');
         const progressBar = document.getElementById('progress-bar');
+        const ambient = document.getElementById('ambient-bg');
 
+        // Update active UI
         document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
         const card = document.getElementById(`card-${index}`);
         if (card) {
             card.classList.add('active');
-            centerActiveCard(card);
+            const ticker = document.getElementById('ticker-scroll');
+            const targetLeft = card.offsetLeft - (ticker.clientWidth / 2) + (card.clientWidth / 2);
+            ticker.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
         }
 
+        // Reset progress bar
         progressBar.style.animation = 'none';
-        progressBar.offsetHeight;
+        void progressBar.offsetWidth;
         progressBar.style.animation = `progress ${ROTATE_INTERVAL}ms linear forwards`;
 
+        // Update Background
+        ambient.style.backgroundImage = `url('${ev.img}')`;
+
         inner.style.opacity = 0;
+        inner.style.transform = 'translateY(10px)';
 
         setTimeout(() => {
             inner.innerHTML = `
-                <div class="hero-info">
-                    <div class="hero-meta-top">
-                        <div class="hero-date">${escapeHtml(ev.date)}</div>
-                        <h2 class="hero-title">${escapeHtml(ev.title)}</h2>
-                        <div class="hero-loc">${escapeHtml(ev.loc)}</div>
-                        <div class="hero-desc-container">
-                            <div class="hero-desc" id="hero-desc">${escapeHtml(ev.desc)}</div>
-                        </div>
+                <div class="hero-info fade-in">
+                    <div class="hero-date-tag">${escapeHtml(ev.date)}</div>
+                    <h2 class="hero-title">${escapeHtml(ev.title)}</h2>
+                    <div class="hero-loc">
+                        <svg class="icon-pin" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        ${escapeHtml(ev.loc)}
+                    </div>
+                    <div class="hero-desc-container">
+                        <div class="hero-desc" id="hero-desc">${escapeHtml(ev.desc)}</div>
                     </div>
                 </div>
-                <div class="hero-visual">
-                    <img src="${escapeHtml(ev.img)}" class="hero-image" onerror="this.src='${PLACEHOLDER}'">
+                <div class="hero-visual fade-in" style="animation-delay: 0.1s">
+                    <div class="image-wrapper">
+                        <img src="${escapeHtml(ev.img)}" class="hero-image" onerror="this.src='${PLACEHOLDER}'">
+                    </div>
                 </div>
             `;
 
-            const qr = document.getElementById("qr-target");
-            qr.innerHTML = "";
-            new QRCode(qr, {
+            // QR Code
+            const qrTarget = document.getElementById("qr-target");
+            qrTarget.innerHTML = "";
+            new QRCode(qrTarget, {
                 text: ev.url,
-                width: 75,
-                height: 75,
+                width: 80,
+                height: 80,
                 colorDark: "#000",
                 colorLight: "#fff",
-                correctLevel: QRCode.CorrectLevel.H
+                correctLevel: QRCode.CorrectLevel.M
             });
 
+            // Handle description scrolling
             setTimeout(() => {
                 const d = document.getElementById('hero-desc');
                 if (!d) return;
-
-                d.style.animation = 'none';
-                d.style.transform = 'translateY(0)';
-
-                const dist = d.parentElement.clientHeight - d.scrollHeight;
+                const dist = d.parentElement.clientHeight - d.scrollHeight - 40;
                 if (dist < 0) {
                     d.style.setProperty('--scroll-dist', `${dist}px`);
-                    d.style.animation = `scrollDescription ${ROTATE_INTERVAL}ms linear forwards`;
+                    d.style.animation = `scrollDescription ${ROTATE_INTERVAL}ms linear infinite alternate`;
                 }
-            }, 500);
+            }, 1000);
 
             inner.style.opacity = 1;
+            inner.style.transform = 'translateY(0)';
         }, 300);
     }
 
@@ -546,8 +622,14 @@
         showEvent(currentIndex);
     }
 
+    // Initialize
     loadData();
-    setInterval(() => window.location.reload(), 30 * 60 * 1000);
+
+    // Full refresh every 30 minutes to stay fresh
+    setInterval(() => {
+        if (document.hidden) return; // Don't refresh if not visible
+        window.location.reload();
+    }, 30 * 60 * 1000);
 </script>
 </body>
 </html>
