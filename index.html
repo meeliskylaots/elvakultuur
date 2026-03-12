@@ -242,13 +242,7 @@
     };
 
     function buildApiUrl(forceRefresh) {
-      let baseUrl = CONFIG_SCRIPT_URL;
-
-      if (!baseUrl || baseUrl.indexOf('https://') !== 0) {
-        baseUrl = window.location.href.split('?')[0];
-      }
-
-      const url = new URL(baseUrl);
+      const url = new URL(CONFIG_SCRIPT_URL);
       url.searchParams.set('format', 'json');
       url.searchParams.set('t', Date.now());
 
@@ -265,11 +259,11 @@
       try {
         const res = await fetch(buildApiUrl(forceRefresh), { cache: 'no-store' });
         const text = await res.text();
-        let data;
 
+        let data;
         try {
           data = JSON.parse(text);
-        } catch (parseErr) {
+        } catch (e) {
           throw new Error('Vastus ei olnud JSON');
         }
 
@@ -335,7 +329,7 @@
         <article class="card">
           ${imageHtml}
           <div class="content">
-            <div class="badge">${escapeHtml(getBadgeText(start, end))}</div>
+            <div class="badge">${escapeHtml(getBadgeText(start))}</div>
             <h2 class="event-title">${escapeHtml(event.title || '')}</h2>
             <div class="meta">
               <div>${escapeHtml(formatEventTime(start, end))}</div>
@@ -415,13 +409,8 @@
       return `${startDate} · ${startTime} – ${endDate} · ${endTime}`;
     }
 
-    function getBadgeText(start, end) {
+    function getBadgeText(start) {
       const now = new Date();
-
-      if (end && end > start && now >= start && now <= end) {
-        return 'Praegu käib';
-      }
-
       const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
       const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const diffDays = Math.round((startDay.getTime() - nowDay.getTime()) / 86400000);
