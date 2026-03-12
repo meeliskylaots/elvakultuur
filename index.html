@@ -405,7 +405,7 @@
         const loader = document.getElementById('loader');
         try {
             const ts = Date.now();
-            const res = await fetch(`${SCRIPT_URL}?refresh=1&t=${ts}`, { cache: 'no-store' });
+           const res = await fetch(`${SCRIPT_URL}?format=json&refresh=1&t=${ts}`, { cache: 'no-store' });
             const data = await res.json();
             
             const raw = data.events || (Array.isArray(data) ? data : []);
