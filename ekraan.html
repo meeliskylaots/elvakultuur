@@ -281,6 +281,8 @@
             font-weight: 300;
             letter-spacing: 4px;
             font-size: 0.9rem;
+            text-align: center;
+            padding: 20px;
         }
 
         @keyframes scrollDescription {
@@ -354,33 +356,25 @@
 
     function formatEstonianDate(iso, fallback) {
         if (!iso) return fallback || '';
-
         const d = new Date(iso);
         if (Number.isNaN(d.getTime())) return fallback || '';
-
         const days = ['Pühapäev', 'Esmaspäev', 'Teisipäev', 'Kolmapäev', 'Neljapäev', 'Reede', 'Laupäev'];
         const months = ['jaanuar', 'veebruar', 'märts', 'aprill', 'mai', 'juuni', 'juuli', 'august', 'september', 'oktoober', 'november', 'detsember'];
-
         return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()} | kell ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
     }
 
     function cleanLocation(value) {
         if (!value) return "Elva vald";
-
-        const cleaned = String(value)
+        return String(value)
             .replace(/Elva vald|Elva|Tartu maakond/gi, "")
             .replace(/,?\s*,/g, ",")
             .trim()
-            .replace(/^,|,$/g, "")
-            .trim();
-
-        return cleaned || "Elva vald";
+            .replace(/^,|,$/g, "") || "Elva vald";
     }
 
     function safeUrl(value) {
         const url = String(value || '').trim();
-        if (/^https?:\/\//i.test(url)) return url;
-        return DEFAULT_URL;
+        return /^https?:\/\//i.test(url) ? url : DEFAULT_URL;
     }
 
     function resetRotation() {
@@ -393,24 +387,30 @@
         const appMain = document.getElementById('app-main');
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?t=${Date.now()}`, {
-                cache: 'no-store'
+            const res = await fetch(`${SCRIPT_URL}?t=${Date.now()}`, { 
+                cache: 'no-store' 
             });
 
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`);
-            }
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
             const data = await res.json();
-
-            if (!data || data.ok !== true) {
-                throw new Error(data?.error || 'Backend error');
-            }
+            if (!data || data.ok !== true) throw new Error(data?.error || 'Backend error');
 
             const raw = Array.isArray(data.events) ? data.events : [];
+            
+            const now = new Date();
+            // Lubame ka paar tundi minevikus sündmusi juhuks kui timezone on nihkes
+            const cutoff = new Date(now.getTime() - (3 * 60 * 60 * 1000));
+            const limit = new Date(now.getTime() + (31 * 24 * 60 * 60 * 1000));
 
             events = raw
-                .filter(e => e && e.title)
+                .filter(e => {
+                    if (!e || !e.title || !e.startIso) return false;
+                    const eventDate = new Date(e.startIso);
+                    if (isNaN(eventDate.getTime())) return false;
+                    return eventDate >= cutoff && eventDate <= limit;
+                })
+                .sort((a, b) => new Date(a.startIso) - new Date(b.startIso))
                 .map(e => ({
                     title: e.title || 'Pealkiri puudub',
                     date: formatEstonianDate(e.startIso, e.date || ''),
@@ -421,25 +421,23 @@
                 }));
 
             if (events.length === 0) {
-                loader.textContent = 'SÜNDMUSI EI LEITUD';
+                loader.innerHTML = `JÄRGMISE 30 PÄEVA SÜNDMUSI EI LEITUD<br><small style="font-size:0.6rem; opacity:0.6;">Saadi kokku ${raw.length} sündmust.</small>`;
                 return;
             }
 
             loader.style.display = 'none';
             appMain.style.display = 'flex';
-
             renderTicker();
-            showEvent(0, true);
+            showEvent(currentIndex, true);
             resetRotation();
         } catch (err) {
-            loader.textContent = 'VIGA LAADIMISEL';
+            loader.innerHTML = `VIGA LAADIMISEL<br><small style="font-size:0.6rem;">${err.message}</small>`;
             console.error(err);
         }
     }
 
     function renderTicker() {
         const ticker = document.getElementById('ticker-scroll');
-
         ticker.innerHTML = events.map((ev, i) => `
             <div class="event-card" id="card-${i}" onclick="showEvent(${i})">
                 <img src="${escapeHtml(ev.img)}" class="event-card-img" onerror="this.src='${PLACEHOLDER}'" alt="">
@@ -461,32 +459,22 @@
 
     function showEvent(index, keepExistingRotation = false) {
         if (!events.length) return;
-
         currentIndex = index;
         const ev = events[index];
         const inner = document.getElementById('hero-inner');
-
-        if (!keepExistingRotation) {
-            resetRotation();
-        }
-
+        if (!keepExistingRotation) resetRotation();
         document.querySelectorAll('.event-card').forEach(card => card.classList.remove('active'));
-
         const activeCard = document.getElementById(`card-${index}`);
         if (activeCard) {
             activeCard.classList.add('active');
-
             const ticker = document.getElementById('ticker-scroll');
             ticker.scrollTo({
                 left: activeCard.offsetLeft - (ticker.clientWidth / 2) + (activeCard.clientWidth / 2),
                 behavior: 'smooth'
             });
         }
-
         startProgressBar();
-
         inner.style.opacity = 0;
-
         setTimeout(() => {
             inner.innerHTML = `
                 <div class="hero-info">
@@ -503,10 +491,8 @@
                     <img src="${escapeHtml(ev.img)}" class="hero-image" onerror="this.src='${PLACEHOLDER}'" alt="">
                 </div>
             `;
-
             const qr = document.getElementById('qr-target');
             qr.innerHTML = '';
-
             new QRCode(qr, {
                 text: ev.url,
                 width: 65,
@@ -515,21 +501,17 @@
                 colorLight: "#fff",
                 correctLevel: QRCode.CorrectLevel.H
             });
-
             setTimeout(() => {
                 const desc = document.getElementById('hero-desc');
                 if (!desc || !desc.parentElement) return;
-
                 desc.style.animation = 'none';
                 desc.style.transform = 'translateY(0)';
-
                 const dist = desc.parentElement.clientHeight - desc.scrollHeight;
                 if (dist < 0) {
                     desc.style.setProperty('--scroll-dist', `${dist}px`);
                     desc.style.animation = `scrollDescription ${ROTATE_INTERVAL}ms linear forwards`;
                 }
             }, 300);
-
             inner.style.opacity = 1;
         }, 300);
     }
