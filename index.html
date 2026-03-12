@@ -5,28 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Elva Valla Kultuuriekraan</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         :root {
             --elva-blue: #1d71d4;
-            --bg-black: #000000;
-            --card-black: #0a0a0a; /* Süsimust teleri jaoks, et tekst ei kaoks ära */
+            --elva-blue-light: #3b82f6;
+            --bg-deep: #020408;
+            --glass-bg: rgba(10, 10, 10, 0.85);
             --text-white: #ffffff;
-            --accent-green: #22c55e;
-            --border: rgba(255, 255, 255, 0.2);
+            --accent-green: #4ade80;
+            --border-light: rgba(255, 255, 255, 0.12);
             
-            --header-h: 10vh;
-            --ticker-h: 16vh;
-            --safe-area: 4vw;
+            --header-h: 12vh;
+            --ticker-h: 18vh;
+            --safe-area: 5vw;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: var(--bg-black);
+            background: var(--bg-deep);
             color: var(--text-white);
             overflow: hidden;
             height: 100vh;
@@ -35,16 +36,25 @@
             padding: 0 var(--safe-area);
         }
 
-        /* Taust on teleris väga tume, et mitte häirida */
+        /* Dünaamiline atmosfäärne taust */
         #ambient-bg {
             position: fixed;
-            inset: 0;
+            inset: -50px;
             z-index: -1;
             background-size: cover;
             background-position: center;
-            filter: brightness(0.12) blur(60px);
-            transform: scale(1.2);
-            transition: background-image 1s ease-in-out;
+            filter: brightness(0.2) blur(80px);
+            transform: scale(1.1);
+            transition: background-image 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Pehme kumaefekt taustal */
+        #ambient-glow {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 20%, rgba(29, 113, 212, 0.15), transparent 40%),
+                        radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.1), transparent 40%);
         }
 
         header {
@@ -52,107 +62,138 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 2px solid var(--border);
+            z-index: 10;
         }
 
         .header-left { display: flex; align-items: center; gap: 1.5vw; }
         .elva-logo {
-            width: 3.5vw; height: 3.5vw; background: var(--elva-blue);
-            border-radius: 20%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 2vw;
+            width: 4vw; height: 4vw; 
+            background: linear-gradient(135deg, var(--elva-blue), var(--elva-blue-light));
+            border-radius: 1vw; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 2.2vw;
+            box-shadow: 0 0 30px rgba(29, 113, 212, 0.4);
         }
-        .header-title { font-size: 1.8vw; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        .header-title { 
+            font-size: 2vw; font-weight: 900; 
+            text-transform: uppercase; letter-spacing: 0.4vw;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
         .clock-section { text-align: right; }
-        .clock { font-size: 3.2vw; font-weight: 900; line-height: 1; }
-        .date-today { font-size: 1.2vw; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+        .clock { font-size: 3.8vw; font-weight: 900; line-height: 1; letter-spacing: -0.1vw; }
+        .date-today { font-size: 1.3vw; font-weight: 700; color: #64748b; text-transform: uppercase; margin-top: 0.5vh; }
 
         .app-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 3vh 0;
-            gap: 3vh;
+            padding: 2vh 0;
+            gap: 4vh;
             min-height: 0;
         }
 
         .hero {
             flex: 1;
-            background: var(--card-black);
-            border: 2px solid var(--border);
-            border-radius: 2.5vw;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border-light);
+            border-radius: 3vw;
             position: relative;
             display: flex;
             overflow: hidden;
-            box-shadow: 0 0 60px rgba(0,0,0,1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
         .progress-bar {
             position: absolute; top: 0; left: 0; height: 0.8vh;
-            background: var(--elva-blue); width: 0; z-index: 10;
+            background: linear-gradient(to right, var(--elva-blue), var(--elva-blue-light));
+            width: 0; z-index: 10;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
         }
 
-        #hero-inner { display: flex; width: 100%; height: 100%; transition: opacity 0.4s ease-in-out; }
+        #hero-inner { display: flex; width: 100%; height: 100%; transition: opacity 0.6s ease; }
 
         .hero-info {
             flex: 0 0 55%; 
-            padding: 4vw;
+            padding: 4.5vw;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
         .hero-date-tag {
-            background: var(--elva-blue);
-            padding: 0.6vw 1.5vw;
-            border-radius: 50px;
+            background: rgba(29, 113, 212, 0.2);
+            color: #60a5fa;
+            padding: 0.7vw 1.8vw;
+            border-radius: 100px;
             font-size: 1.2vw;
             font-weight: 800;
-            margin-bottom: 2vh;
+            margin-bottom: 2.5vh;
             display: inline-block;
             align-self: flex-start;
             text-transform: uppercase;
+            border: 1px solid rgba(29, 113, 212, 0.3);
         }
 
         .hero-title {
-            font-size: clamp(2rem, 3.8vw, 4.5rem);
+            font-size: clamp(2rem, 4.2vw, 5rem);
             font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 2vh;
-            text-shadow: 4px 4px 8px rgba(0,0,0,0.8);
+            line-height: 1.05;
+            margin-bottom: 2.5vh;
+            letter-spacing: -0.02em;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
 
         .hero-loc {
-            font-size: 1.8vw;
-            font-weight: 800;
+            font-size: 1.9vw;
+            font-weight: 700;
             color: var(--accent-green);
-            margin-bottom: 2vh;
+            margin-bottom: 2.5vh;
+            display: flex;
+            align-items: center;
+            gap: 1vw;
         }
 
         .hero-desc {
-            font-size: 1.5vw;
-            line-height: 1.5;
-            color: #e2e8f0;
-            font-weight: 700; 
-            max-width: 90%;
+            font-size: 1.6vw;
+            line-height: 1.6;
+            color: #cbd5e1;
+            font-weight: 600; 
+            max-width: 95%;
+            opacity: 0.9;
         }
 
         .hero-visual {
             flex: 0 0 45%;
-            padding: 3vw;
+            padding: 4vw;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        /* Pildi ümber pehme kuma */
+        .hero-visual::after {
+            content: "";
+            position: absolute;
+            inset: 20%;
+            background: var(--elva-blue);
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: 0;
         }
 
         .image-wrapper {
             width: 100%;
             height: 100%;
-            border-radius: 2vw;
+            border-radius: 2.5vw;
             overflow: hidden;
-            border: 4px solid #1a1a1a;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
             background: #000;
+            z-index: 1;
         }
 
         .hero-image { width: 100%; height: 100%; object-fit: contain; }
@@ -160,61 +201,127 @@
         .bottom-section {
             height: var(--ticker-h);
             display: flex;
-            gap: 2vw;
-            padding-bottom: 3vh;
+            gap: 2.5vw;
+            padding-bottom: 4vh;
+            align-items: center;
         }
 
         .ticker-scroll {
             flex: 1;
             display: flex;
-            gap: 1.5vw;
+            gap: 2vw;
             overflow: hidden;
         }
 
-        .event-card {
-            flex: 0 0 25vw;
-            height: 10vh;
-            background: #111;
-            border: 2px solid var(--border);
-            border-radius: 1.5vw;
+        /* Alumised aknad peavad olema identse kõrgusega */
+        .event-card, .qr-area {
+            height: 11vh;
+            border: 1px solid var(--border-light);
+            border-radius: 2vw;
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
+        }
+
+        .event-card {
+            flex: 0 0 24vw;
+            background: rgba(255, 255, 255, 0.03);
             padding: 1vw;
-            gap: 1vw;
-            transition: all 0.3s ease;
+            gap: 1.2vw;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .event-card.active {
             border-color: var(--elva-blue);
-            background: rgba(29, 113, 212, 0.4);
-            transform: scale(1.03);
+            background: rgba(29, 113, 212, 0.15);
+            transform: translateY(-1vh);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5);
         }
 
-        .event-card-img { width: 5vw; height: 5vw; border-radius: 0.8vw; object-fit: cover; }
-        .event-card-title { font-size: 1.1vw; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .event-card-img { 
+            width: 5.5vw; height: 5.5vw; 
+            border-radius: 1vw; 
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .event-card-title { 
+            font-size: 1.1vw; 
+            font-weight: 800; 
+            line-height: 1.3;
+            color: #fff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
+        /* QR-ala suurus on nüüd rangelt sama mis event-card */
         .qr-area {
-            width: 25vw; background: var(--card-black);
-            border: 2px solid var(--border); border-radius: 2vw;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 1vw 2vw;
+            flex: 0 0 24vw;
+            background: var(--glass-bg);
+            padding: 1.5vw; /* Ühtlustatud padding */
+            justify-content: space-between;
         }
-        .qr-text { font-size: 1vw; font-weight: 900; text-align: right; line-height: 1.2; }
-        .qr-box { background: #fff; padding: 0.5vw; border-radius: 1vw; width: 6vw; height: 6vw; display: flex; align-items: center; justify-content: center; }
+        
+        .qr-text { 
+            font-size: 0.9vw; 
+            font-weight: 800; 
+            text-align: right; 
+            line-height: 1.3; 
+            color: #94a3b8;
+            flex: 1;
+            padding-right: 1.5vw;
+        }
+        .qr-text strong { color: #fff; display: block; font-size: 1vw; }
+        
+        /* QR-koodi kasti mõõtmed poole väiksemaks (u 2.8vw) */
+        .qr-box { 
+            background: #fff; 
+            padding: 0.3vw; 
+            border-radius: 0.8vw; 
+            width: 2.8vw; 
+            height: 2.8vw; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
 
         @keyframes progress { from { width: 0; } to { width: 100%; } }
-        .loader { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; font-size: 4vw; font-weight: 900; color: var(--elva-blue); }
+        
+        .loader { 
+            position: fixed; inset: 0; 
+            background: var(--bg-deep); 
+            z-index: 1000; 
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; 
+            gap: 2vh;
+        }
+        .loader-logo { width: 6vw; height: 6vw; background: var(--elva-blue); border-radius: 1.5vw; animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
 <div id="ambient-bg"></div>
-<div id="loader" class="loader">ELVA VALD</div>
+<div id="ambient-glow"></div>
+
+<div id="loader" class="loader">
+    <div class="loader-logo"></div>
+    <div style="font-size: 2vw; font-weight: 900; letter-spacing: 0.5vw;">ELVA VALD</div>
+</div>
 
 <header>
     <div class="header-left">
         <div class="elva-logo">E</div>
-        <h1 class="header-title">Elva Vald</h1>
+        <h1 class="header-title">Kultuuriekraan</h1>
     </div>
     <div class="clock-section">
         <div class="clock" id="clock">00:00</div>
@@ -231,7 +338,7 @@
     <div class="bottom-section">
         <div class="ticker-scroll" id="ticker-scroll"></div>
         <div class="qr-area">
-            <div class="qr-text">LÄHEMALT<br>& PILETID</div>
+            <div class="qr-text">LÄHEMALT JA<strong>PILETID</strong></div>
             <div id="qr-target" class="qr-box"></div>
         </div>
     </div>
@@ -243,6 +350,19 @@
     
     let events = [];
     let currentIndex = 0;
+
+    function formatEstonianDate(isoString, fallback) {
+        if (!isoString) return fallback;
+        try {
+            const d = new Date(isoString);
+            if (isNaN(d.getTime())) return fallback;
+            const days = ['Pühapäev', 'Esmaspäev', 'Teisipäev', 'Kolmapäev', 'Neljapäev', 'Reede', 'Laupäev'];
+            const months = ['jaanuar', 'veebruar', 'märts', 'aprill', 'mai', 'juuni', 'juuli', 'august', 'september', 'oktoober', 'november', 'detsember'];
+            const hours = d.getHours().toString().padStart(2, '0');
+            const minutes = d.getMinutes().toString().padStart(2, '0');
+            return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]} | kell ${hours}:${minutes}`;
+        } catch (e) { return fallback; }
+    }
 
     function updateClock() {
         const now = new Date();
@@ -257,19 +377,24 @@
             const res = await fetch(`${SCRIPT_URL}?format=json&t=${Date.now()}`);
             const data = await res.json();
             if (data.ok && Array.isArray(data.events)) {
-                events = data.events;
-                document.getElementById('loader').style.display = 'none';
+                events = data.events.map(e => ({
+                    ...e,
+                    displayDate: e.dateText || formatEstonianDate(e.startIso, e.date || "KUUPÄEV TÄPSUSTAMISEL")
+                }));
+                
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+                
                 document.getElementById('app-main').style.visibility = 'visible';
                 renderTicker();
                 showEvent(0);
+                
                 setInterval(() => {
                     if (events.length > 0) {
                         currentIndex = (currentIndex + 1) % events.length;
                         showEvent(currentIndex);
                     }
                 }, ROTATE_INTERVAL);
-            } else {
-                document.getElementById('loader').textContent = "SÜNDMUSI EI LEITUD";
             }
         } catch (e) { 
             console.error(e); 
@@ -280,15 +405,14 @@
     function renderTicker() {
         const t = document.getElementById('ticker-scroll');
         t.innerHTML = events.map((ev, i) => {
-            // Parandatud: Lisatud kontroll ja fallback väärtused, et vältida split() viga
-            const dateStr = String(ev.dateText || ev.date || "Kuupäev puudub");
-            const displayDate = dateStr.includes(',') ? dateStr.split(',')[0] : dateStr;
+            const dateStr = String(ev.displayDate);
+            const displayDateShort = dateStr.includes(',') ? dateStr.split(',')[0] : dateStr;
             
             return `
                 <div class="event-card" id="card-${i}">
                     <img src="${ev.img || ev.pilt || ''}" class="event-card-img" onerror="this.src='https://via.placeholder.com/150?text=ELVA'">
                     <div style="overflow:hidden">
-                        <div style="font-size:0.8vw; color:var(--elva-blue); font-weight:800">${displayDate}</div>
+                        <div style="font-size:0.9vw; color:var(--elva-blue-light); font-weight:800; margin-bottom: 0.2vh">${displayDateShort}</div>
                         <div class="event-card-title">${ev.title || "Pealkiri puudub"}</div>
                     </div>
                 </div>
@@ -317,9 +441,12 @@
         setTimeout(() => {
             inner.innerHTML = `
                 <div class="hero-info">
-                    <div class="hero-date-tag">${ev.dateText || ev.date || "KUUPÄEV TÄPSUSTAMISEL"}</div>
+                    <div class="hero-date-tag">${ev.displayDate}</div>
                     <h2 class="hero-title">${ev.title || "Pealkiri puudub"}</h2>
-                    <div class="hero-loc">📍 ${ev.loc || ev.asutus || "Elva vald"}</div>
+                    <div class="hero-loc">
+                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24" style="width: 2vw; height: 2vw;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        ${ev.loc || ev.asutus || "Elva vald"}
+                    </div>
                     <div class="hero-desc">${ev.desc || ev.description || ""}</div>
                 </div>
                 <div class="hero-visual">
@@ -332,17 +459,17 @@
 
             const qr = document.getElementById("qr-target");
             qr.innerHTML = "";
+            // Genereerime QR koodi vastavalt uuele väiksemale kastile
             new QRCode(qr, { 
                 text: ev.url || "https://elva.ee", 
-                width: 256, 
-                height: 256, 
-                correctLevel: QRCode.CorrectLevel.H 
+                width: 128, 
+                height: 128, 
+                correctLevel: QRCode.CorrectLevel.M 
             });
-        }, 200);
+        }, 250);
     }
 
     loadData();
-    // Värskenda lehte iga tunni järel
     setInterval(() => window.location.reload(), 3600000);
 </script>
 </body>
