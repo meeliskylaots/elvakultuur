@@ -159,7 +159,7 @@
             display: flex;
             gap: 2vw;
             padding-bottom: 4vh;
-            align-items: stretch; /* Tagab, et QR-ala on sama kõrge kui tiker */
+            align-items: stretch;
         }
 
         .ticker-scroll {
@@ -206,7 +206,6 @@
             background: #fff; 
             padding: 0.4vw; 
             border-radius: 0.8vw; 
-            /* QR koodi suurus on nüüd seotud alumise rea kõrgusega */
             height: calc(var(--ticker-h) - 6vh); 
             width: calc(var(--ticker-h) - 6vh);
             display: flex; 
@@ -269,9 +268,30 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Abifunktsioon kuupäeva puhastamiseks
+    // Funktsioon ISO-stringi vormistamiseks eestikeelseks tekstiks
+    function formatIsoDate(isoString) {
+        if (!isoString || typeof isoString !== 'string' || !isoString.includes('T')) return isoString;
+        try {
+            const d = new Date(isoString);
+            if (isNaN(d.getTime())) return isoString;
+            
+            const days = ['Pühapäev', 'Esmaspäev', 'Teisipäev', 'Kolmapäev', 'Neljapäev', 'Reede', 'Laupäev'];
+            const months = ['jaanuar', 'veebruar', 'märts', 'aprill', 'mai', 'juuni', 'juuli', 'august', 'september', 'oktoober', 'november', 'detsember'];
+            
+            const hours = d.getHours().toString().padStart(2, '0');
+            const minutes = d.getMinutes().toString().padStart(2, '0');
+            
+            return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]} | kell ${hours}:${minutes}`;
+        } catch (e) {
+            return isoString;
+        }
+    }
+
     function getCleanDate(ev) {
-        return ev.dateText || ev.date || ev.startIso || "Kuupäev täpsustamisel";
+        // Kontrollime esmalt, kas startIso on olemas ja vormistame selle
+        if (ev.startIso) return formatIsoDate(ev.startIso);
+        // Kui ei, kasutame teisi välju
+        return ev.dateText || ev.date || "Kuupäev täpsustamisel";
     }
 
     async function loadData() {
@@ -350,7 +370,6 @@
         const qrTarget = document.getElementById("qr-target");
         if (qrTarget) {
             qrTarget.innerHTML = "";
-            // Arvutame kasti suuruse piksli täpsusega
             const size = qrTarget.offsetWidth; 
             new QRCode(qrTarget, { 
                 text: ev.url || "https://elva.ee", 
