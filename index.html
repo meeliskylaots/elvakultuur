@@ -16,7 +16,6 @@
             --text-white: #ffffff;
             --accent-green: #22c55e;
             --border: rgba(255, 255, 255, 0.15);
-            
             --header-h: 12vh;
             --ticker-h: 15vh;
             --safe-area: 5vw;
@@ -264,14 +263,17 @@
         }
 
         @keyframes progress { from { width: 0; } to { width: 100%; } }
-        .loader { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; font-size: 4vw; font-weight: 900; color: var(--elva-blue); letter-spacing: 5px; }
-        .error-message { font-size: 2vw; color: #f87171; text-align: center; width: 100%; padding: 40px; font-weight: 700; }
+        .loader { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; font-size: 3vw; font-weight: 900; color: var(--elva-blue); flex-direction: column; }
+        .error-details { font-size: 1.2vw; color: #64748b; margin-top: 2vh; font-weight: 600; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="ambient-bg"></div>
-<div id="loader" class="loader">ELVA VALD</div>
+<div id="loader" class="loader">
+    LAEN ANDMEID...
+    <div id="loader-error" class="error-details">Ootan Kultuuriakna värskeid sündmusi</div>
+</div>
 
 <header>
     <div class="header-left">
@@ -300,9 +302,9 @@
 </main>
 
 <script>
-    // See URL on sinu andmete allikas. 
+    // Sinu Google Apps Scripti link
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
-    const ROTATE_INTERVAL = 15000; 
+    const ROTATE_INTERVAL = 15000; // Sündmus vahetub iga 15 sek järel
     
     let events = [];
     let currentIndex = 0;
@@ -330,29 +332,29 @@
             const res = await fetch(`${SCRIPT_URL}?format=json&t=${Date.now()}`);
             const text = await res.text();
             
-            // Kui vastus pole JSON, viskame vea (väldib HTMLi parsimist)
             if (text.trim().startsWith('<')) {
-                throw new Error("Vigane vastus serverist (HTML asemel JSON)");
+                throw new Error("Google Script ei tagastanud JSON andmeid.");
             }
             
             const data = JSON.parse(text);
-            if (data.ok && data.events) {
+            if (data.ok && data.events && data.events.length > 0) {
                 events = data.events;
             } else {
                 events = [];
             }
         } catch (e) { 
-            console.error("Viga andmete laadimisel:", e); 
-            events = []; // Tühjendame nimekirja, kui päris andmeid ei saa
+            console.error("Viga laadimisel:", e); 
+            events = []; 
         }
         processData();
     }
 
     function processData() {
-        document.getElementById('loader').style.display = 'none';
+        const loader = document.getElementById('loader');
         const appMain = document.getElementById('app-main');
         
         if (events && events.length > 0) {
+            loader.style.display = 'none';
             appMain.style.visibility = 'visible';
             renderTicker();
             showEvent(0);
@@ -364,8 +366,11 @@
             }, ROTATE_INTERVAL);
         } else {
             appMain.style.visibility = 'hidden';
-            document.getElementById('loader').innerHTML = `<div class="error-message">HETKEL ÜRITUSI EI OLE<br><span style="font-size: 1vw; opacity: 0.6; font-weight: 400;">(Kontrolli ühendust Google Scriptiga)</span></div>`;
-            document.getElementById('loader').style.display = 'flex';
+            loader.innerHTML = `
+                <div>HETKEL ÜRITUSI EI OLE</div>
+                <div class="error-details">Kultuuriaknas Elva valla sündmused hetkel puuduvad.</div>
+            `;
+            loader.style.display = 'flex';
         }
     }
 
@@ -378,7 +383,7 @@
             const displayTime = date.toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' });
             return `
                 <div class="event-card" id="card-${i}" onclick="currentIndex=${i}; showEvent(${i})">
-                    <img src="${ev.img || ''}" class="event-card-img" onerror="this.style.display='none'">
+                    <img src="${ev.img || ''}" class="event-card-img" onerror="this.style.visibility='hidden'">
                     <div class="event-card-info">
                         <div class="event-card-date">${displayDate} · ${displayTime}</div>
                         <div class="event-card-title">${ev.title || "Üritus"}</div>
