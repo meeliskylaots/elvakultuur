@@ -33,7 +33,7 @@
             display: flex;
             flex-direction: column;
             padding: 0 var(--safe-area);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
         #ambient-bg {
@@ -42,8 +42,8 @@
             z-index: -1;
             background-size: cover;
             background-position: center;
-            filter: brightness(0.12) blur(80px);
-            transition: background-image 1.2s ease-in-out;
+            filter: brightness(0.15) blur(80px);
+            transition: background-image 1.5s ease-in-out;
             transform: scale(1.2);
         }
 
@@ -64,8 +64,8 @@
         .header-title { font-size: 1.6vw; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
 
         .clock-section { text-align: right; }
-        .clock { font-size: 3.5vw; font-weight: 900; line-height: 1; }
-        .date-today { font-size: 1.2vw; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+        .clock { font-size: 3.8vw; font-weight: 900; line-height: 1; }
+        .date-today { font-size: 1.3vw; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-top: 5px; }
 
         .app-content {
             flex: 1;
@@ -84,7 +84,7 @@
             position: relative;
             display: flex;
             overflow: hidden;
-            box-shadow: 0 0 80px rgba(0,0,0,1);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
         }
 
         .progress-bar {
@@ -96,7 +96,7 @@
             display: flex; 
             width: 100%; 
             height: 100%; 
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
         }
 
         .hero-info {
@@ -105,6 +105,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            min-width: 0;
         }
 
         .hero-date-tag {
@@ -116,15 +117,16 @@
             margin-bottom: 2.5vh;
             display: inline-block;
             align-self: flex-start;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
         .hero-title {
-            font-size: 3vw;
+            font-size: 3.2vw;
             font-weight: 900;
             line-height: 1.1;
             margin-bottom: 2vh;
             color: #ffffff;
+            word-wrap: break-word;
         }
 
         .hero-loc {
@@ -138,16 +140,16 @@
             font-size: 1.5vw;
             line-height: 1.5;
             color: #cbd5e1;
-            font-weight: 700;
+            font-weight: 600;
             max-width: 95%;
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 5;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
         .hero-visual {
-            flex: 0 0 40%;
+            flex: 0 0 42%;
             padding: 4vw;
             display: flex;
             align-items: center;
@@ -157,12 +159,13 @@
         .image-wrapper {
             width: 100%;
             height: 100%;
-            border-radius: 1.5vw;
+            border-radius: 1.8vw;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .hero-image { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        .hero-image { width: 100%; height: 100%; object-fit: contain; background: #050505; }
 
         .bottom-section {
             height: var(--ticker-h);
@@ -170,53 +173,59 @@
             gap: 2vw;
             padding-bottom: 4vh;
             align-items: stretch;
+            min-height: 0;
         }
 
         .ticker-scroll {
             flex: 1;
             display: flex;
             gap: 1.5vw;
-            overflow: hidden;
+            overflow-x: auto;
+            scrollbar-width: none; 
+            scroll-behavior: smooth;
         }
+        .ticker-scroll::-webkit-scrollbar { display: none; }
 
         .event-card {
-            flex: 0 0 22vw;
+            flex: 0 0 24vw;
             height: 100%;
-            background: #111;
+            background: #0a0a0a;
             border: 2px solid var(--border);
-            border-radius: 1.5vw;
+            border-radius: 1.4vw;
             display: flex;
             align-items: center;
-            padding: 0.8vw;
-            gap: 1vw;
-            transition: all 0.4s ease;
+            padding: 1vw;
+            gap: 1.2vw;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
 
         .event-card.active {
-            border: 5px solid var(--elva-blue);
-            background: rgba(29, 113, 212, 0.4);
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(29, 113, 212, 0.5);
+            border: 4px solid var(--elva-blue);
+            background: rgba(29, 113, 212, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(29, 113, 212, 0.3);
         }
 
-        .event-card-img { width: 4.5vw; height: 4.5vw; border-radius: 0.8vw; object-fit: cover; }
+        .event-card-img { width: 4.5vw; height: 4.5vw; border-radius: 0.8vw; object-fit: cover; background: #222; }
         
         .event-card-info {
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 0.2vw;
+            gap: 0.3vw;
+            flex: 1;
         }
 
         .event-card-date {
-            font-size: 0.9vw;
+            font-size: 0.85vw;
             color: var(--elva-blue);
             font-weight: 800;
             text-transform: uppercase;
         }
 
         .event-card-title {
-            font-size: 1vw;
+            font-size: 1.05vw;
             font-weight: 800;
             white-space: nowrap;
             overflow: hidden;
@@ -225,27 +234,28 @@
         }
 
         .qr-area {
-            width: 24vw; 
+            width: 25vw; 
             background: var(--card-black);
             border: 2px solid var(--border); 
             border-radius: 2vw;
             display: flex; 
             align-items: center; 
             justify-content: space-between;
-            padding: 0.8vw 1.5vw;
-            gap: 1vw;
+            padding: 0.8vw 2vw;
+            gap: 1.5vw;
         }
-        .qr-text { font-size: 1vw; font-weight: 900; text-align: right; line-height: 1.2; color: #fff; flex: 1; }
+        .qr-text { font-size: 1vw; font-weight: 900; text-align: right; line-height: 1.2; color: #fff; flex: 1; letter-spacing: 0.5px; }
         
         .qr-box { 
             background: #fff; 
-            padding: 0.4vw; 
-            border-radius: 0.8vw; 
-            height: 5vw; 
-            width: 5vw;
+            padding: 0.5vw; 
+            border-radius: 1vw; 
+            height: 6vw; 
+            width: 6vw;
             display: flex; 
             align-items: center; 
             justify-content: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         #qr-target img, #qr-target canvas {
@@ -254,7 +264,8 @@
         }
 
         @keyframes progress { from { width: 0; } to { width: 100%; } }
-        .loader { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; font-size: 4vw; font-weight: 900; color: var(--elva-blue); }
+        .loader { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; font-size: 4vw; font-weight: 900; color: var(--elva-blue); letter-spacing: 5px; }
+        .error-message { font-size: 2vw; color: #f87171; text-align: center; width: 100%; padding: 40px; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -289,39 +300,12 @@
 </main>
 
 <script>
+    // See URL on sinu andmete allikas. 
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
     const ROTATE_INTERVAL = 15000; 
     
     let events = [];
     let currentIndex = 0;
-
-    // Näidisandmed juhuks, kui päring ebaõnnestub
-    const MOCK_DATA = [
-        {
-            title: "Elva spordihoone mitmevõistlus",
-            startIso: new Date().toISOString(),
-            loc: "Elva Spordihoone",
-            desc: "1. aprill 2026.a. algusega kell 16.00 toimub Elva Spordihoone mitmevõistlus - kavas on 30 m jooks püstilähtest, topispalli heide ette, paigalt kaugushüpe...",
-            img: "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80",
-            url: "https://elva.ee"
-        },
-        {
-            title: "\"Väike nõid\"",
-            startIso: new Date(Date.now() + 86400000).toISOString(),
-            loc: "Tartumaa Tervisespordikeskus",
-            desc: "Otfried Preussleri ainetel Aire Pajur / Margus Möll. Lavastajad Aire Pajur / Margus Möll. Muusikaline kujundus Hella Niitra ja Kristjan Vaher...",
-            img: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=1200&q=80",
-            url: "https://elva.ee"
-        },
-        {
-            title: "Elva Valla Kultuuripreemiate Gala",
-            startIso: new Date(Date.now() + 172800000).toISOString(),
-            loc: "Elva Kultuurikeskus",
-            desc: "Pidulik õhtu, kus tunnustatakse valla silmapaistvamaid kultuuritegelasi. Esinevad kohalikud kollektiivid ja üllatusesinejad.",
-            img: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1200&q=80",
-            url: "https://elva.ee"
-        }
-    ];
 
     function updateClock() {
         const now = new Date();
@@ -333,38 +317,43 @@
 
     function formatIsoDate(isoString) {
         if (!isoString) return "Kuupäev puudub";
-        const d = new Date(isoString);
+        let cleanIso = isoString.replace('Z', '').split('+')[0];
+        const d = new Date(cleanIso);
         if (isNaN(d.getTime())) return isoString;
-        
         const days = ['Pühapäev', 'Esmaspäev', 'Teisipäev', 'Kolmapäev', 'Neljapäev', 'Reede', 'Laupäev'];
         const months = ['jaanuar', 'veebruar', 'märts', 'aprill', 'mai', 'juuni', 'juuli', 'august', 'september', 'oktoober', 'november', 'detsember'];
-        
         return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]} | kell ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
     }
 
     async function loadData() {
         try {
             const res = await fetch(`${SCRIPT_URL}?format=json&t=${Date.now()}`);
-            const data = await res.json();
-            if (data.ok && data.events && data.events.length > 0) {
+            const text = await res.text();
+            
+            // Kui vastus pole JSON, viskame vea (väldib HTMLi parsimist)
+            if (text.trim().startsWith('<')) {
+                throw new Error("Vigane vastus serverist (HTML asemel JSON)");
+            }
+            
+            const data = JSON.parse(text);
+            if (data.ok && data.events) {
                 events = data.events;
             } else {
-                console.log("Kasutan näidisandmeid.");
-                events = MOCK_DATA;
+                events = [];
             }
         } catch (e) { 
-            console.error("Viga laadimisel, kasutan näidisandmeid:", e); 
-            events = MOCK_DATA;
+            console.error("Viga andmete laadimisel:", e); 
+            events = []; // Tühjendame nimekirja, kui päris andmeid ei saa
         }
-        
         processData();
     }
 
     function processData() {
         document.getElementById('loader').style.display = 'none';
-        document.getElementById('app-main').style.visibility = 'visible';
+        const appMain = document.getElementById('app-main');
         
-        if (events.length > 0) {
+        if (events && events.length > 0) {
+            appMain.style.visibility = 'visible';
             renderTicker();
             showEvent(0);
             
@@ -374,7 +363,8 @@
                 showEvent(currentIndex);
             }, ROTATE_INTERVAL);
         } else {
-            document.getElementById('loader').innerText = "HETKEL ÜRITUSI EI OLE";
+            appMain.style.visibility = 'hidden';
+            document.getElementById('loader').innerHTML = `<div class="error-message">HETKEL ÜRITUSI EI OLE<br><span style="font-size: 1vw; opacity: 0.6; font-weight: 400;">(Kontrolli ühendust Google Scriptiga)</span></div>`;
             document.getElementById('loader').style.display = 'flex';
         }
     }
@@ -382,15 +372,16 @@
     function renderTicker() {
         const t = document.getElementById('ticker-scroll');
         t.innerHTML = events.map((ev, i) => {
-            const date = new Date(ev.startIso);
+            let cleanIso = (ev.startIso || "").replace('Z', '').split('+')[0];
+            const date = new Date(cleanIso);
             const displayDate = date.toLocaleDateString('et-EE', { day: 'numeric', month: 'short' });
-            
+            const displayTime = date.toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' });
             return `
                 <div class="event-card" id="card-${i}" onclick="currentIndex=${i}; showEvent(${i})">
-                    <img src="${ev.img || 'https://via.placeholder.com/150'}" class="event-card-img" onerror="this.src='https://via.placeholder.com/150'">
+                    <img src="${ev.img || ''}" class="event-card-img" onerror="this.style.display='none'">
                     <div class="event-card-info">
-                        <div class="event-card-date">${displayDate}</div>
-                        <div class="event-card-title">${ev.title}</div>
+                        <div class="event-card-date">${displayDate} · ${displayTime}</div>
+                        <div class="event-card-title">${ev.title || "Üritus"}</div>
                     </div>
                 </div>
             `;
@@ -404,7 +395,7 @@
         const pb = document.getElementById('progress-bar');
         
         inner.style.opacity = 0;
-        inner.style.transform = 'translateY(10px)';
+        inner.style.transform = 'translateY(15px)';
 
         setTimeout(() => {
             document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
@@ -420,18 +411,20 @@
             
             if (ev.img) {
                 document.getElementById('ambient-bg').style.backgroundImage = `url('${ev.img}')`;
+            } else {
+                document.getElementById('ambient-bg').style.backgroundImage = 'none';
             }
 
             inner.innerHTML = `
                 <div class="hero-info">
                     <div class="hero-date-tag">${formatIsoDate(ev.startIso)}</div>
-                    <h2 class="hero-title">${ev.title}</h2>
+                    <h2 class="hero-title">${ev.title || "Pealkiri puudub"}</h2>
                     <div class="hero-loc">📍 ${ev.loc || "Elva vald"}</div>
                     <div class="hero-desc">${ev.desc || ""}</div>
                 </div>
                 <div class="hero-visual">
                     <div class="image-wrapper">
-                        <img src="${ev.img || 'https://via.placeholder.com/150'}" class="hero-image" onerror="this.src='https://via.placeholder.com/150'">
+                        <img src="${ev.img || ''}" class="hero-image" onerror="this.style.display='none'">
                     </div>
                 </div>
             `;
@@ -440,9 +433,9 @@
             if (qrTarget) {
                 qrTarget.innerHTML = "";
                 new QRCode(qrTarget, { 
-                    text: ev.url || "https://elva.ee", 
-                    width: 120, 
-                    height: 120, 
+                    text: ev.url || "https://kultuuriaken.tartu.ee", 
+                    width: 150, 
+                    height: 150, 
                     colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.M 
@@ -451,11 +444,11 @@
 
             inner.style.opacity = 1;
             inner.style.transform = 'translateY(0)';
-        }, 400);
+        }, 300);
     }
 
     loadData();
-    setInterval(loadData, 3600000);
+    setInterval(loadData, 1800000); 
 </script>
 </body>
 </html>
