@@ -500,20 +500,9 @@
 
     function formatIsoDate(startIso, endIso) {
         const start = parseDate(startIso);
-        const end = parseDate(endIso);
 
         if (!start) {
             return "Kuupäev puudub";
-        }
-
-        if (end && isMultiDayEvent(start, end)) {
-            const now = new Date();
-
-            if (start <= now && end >= now) {
-                return `Kestab kuni ${formatShortDate(end)}`;
-            }
-
-            return `${formatShortDate(start)} – ${formatShortDate(end)}`;
         }
 
         const weekday = new Intl.DateTimeFormat('et-EE', {
@@ -542,20 +531,9 @@
 
     function formatCardDate(startIso, endIso) {
         const start = parseDate(startIso);
-        const end = parseDate(endIso);
 
         if (!start) {
             return "Aeg puudub";
-        }
-
-        if (end && isMultiDayEvent(start, end)) {
-            const now = new Date();
-
-            if (start <= now && end >= now) {
-                return `Kuni ${formatShortDate(end)}`;
-            }
-
-            return `${formatShortDate(start)} – ${formatShortDate(end)}`;
         }
 
         const date = new Intl.DateTimeFormat('et-EE', {
@@ -571,25 +549,6 @@
         }).format(start);
 
         return `${date} · ${time}`;
-    }
-
-    function isMultiDayEvent(start, end) {
-        const diff = end.getTime() - start.getTime();
-        return diff > 20 * 60 * 60 * 1000;
-    }
-
-    function formatShortDate(date) {
-        const day = new Intl.DateTimeFormat('et-EE', {
-            day: 'numeric',
-            timeZone: TIME_ZONE
-        }).format(date);
-
-        const month = new Intl.DateTimeFormat('et-EE', {
-            month: 'long',
-            timeZone: TIME_ZONE
-        }).format(date);
-
-        return `${day}. ${month}`;
     }
 
     function parseDate(isoString) {
@@ -684,7 +643,7 @@
             if (!loader.dataset.customError) {
                 showLoaderMessage(
                     "HETKEL ÜRITUSI EI OLE",
-                    "Kultuuriaknas Elva valla eelseisvad sündmused hetkel puuduvad."
+                    "Kultuuriaknas Elva valla järgmise kuu sündmused hetkel puuduvad."
                 );
             }
 
