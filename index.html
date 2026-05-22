@@ -45,6 +45,63 @@
             flex-direction: column;
             padding: 0 var(--safe-area);
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            transition: background 0.8s ease, color 0.8s ease;
+        }
+
+        body.theme-day {
+            --bg-black: #f4f7fb;
+            --card-black: #ffffff;
+            --text-white: #0f172a;
+            --soft-text: #334155;
+            --muted: #475569;
+            --border: rgba(15, 23, 42, 0.14);
+            text-shadow: none;
+        }
+
+        body.theme-day .hero,
+        body.theme-day .qr-area,
+        body.theme-day .event-card {
+            box-shadow: 0 18px 60px rgba(15, 23, 42, 0.14);
+        }
+
+        body.theme-day .event-card {
+            background: #ffffff;
+        }
+
+        body.theme-day .event-card.active {
+            background: rgba(29, 113, 212, 0.14);
+        }
+
+        body.theme-day .event-card-title {
+            color: #0f172a;
+        }
+
+        body.theme-day .image-wrapper,
+        body.theme-day .hero-image {
+            background: #f8fafc;
+        }
+
+        body.theme-day .image-placeholder {
+            background: linear-gradient(135deg, #dbeafe, #f8fafc);
+            color: rgba(15, 23, 42, 0.25);
+        }
+
+        body.theme-day #ambient-bg {
+            filter: brightness(0.75) blur(90px);
+            opacity: 0.25;
+        }
+
+        body.theme-day .qr-box {
+            border: 1px solid rgba(15, 23, 42, 0.12);
+        }
+
+        body.theme-night {
+            --bg-black: #000000;
+            --card-black: #080808;
+            --text-white: #ffffff;
+            --soft-text: #cbd5e1;
+            --muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.15);
         }
 
         #ambient-bg {
@@ -54,7 +111,7 @@
             background-size: cover;
             background-position: center;
             filter: brightness(0.15) blur(80px);
-            transition: background-image 1.5s ease-in-out;
+            transition: background-image 1.5s ease-in-out, filter 0.8s ease, opacity 0.8s ease;
             transform: scale(1.2);
         }
 
@@ -77,6 +134,7 @@
             width: 3.5vw;
             height: 3.5vw;
             background: var(--elva-blue);
+            color: #ffffff;
             border-radius: 20%;
             display: flex;
             align-items: center;
@@ -130,6 +188,7 @@
             overflow: hidden;
             box-shadow: 0 20px 80px rgba(0,0,0,0.8);
             min-height: 0;
+            transition: background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease;
         }
 
         .progress-bar {
@@ -160,6 +219,7 @@
 
         .hero-date-tag {
             background: var(--elva-blue);
+            color: #ffffff;
             padding: 0.8vw 2vw;
             border-radius: 50px;
             font-size: 1.3vw;
@@ -175,7 +235,7 @@
             font-weight: 900;
             line-height: 1.1;
             margin-bottom: 2vh;
-            color: #ffffff;
+            color: var(--text-white);
             word-wrap: break-word;
         }
 
@@ -192,10 +252,30 @@
             color: var(--soft-text);
             font-weight: 600;
             max-width: 95%;
-            display: -webkit-box;
-            -webkit-line-clamp: 5;
-            -webkit-box-orient: vertical;
+            max-height: 11.5em;
             overflow: hidden;
+            position: relative;
+        }
+
+        .hero-desc-inner {
+            display: block;
+            will-change: transform;
+        }
+
+        .hero-desc-inner.scroll-needed {
+            animation-name: descScroll;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes descScroll {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(var(--scroll-distance, 0px));
+            }
         }
 
         .hero-visual {
@@ -217,6 +297,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.8s ease;
         }
 
         .hero-image {
@@ -224,6 +305,7 @@
             height: 100%;
             object-fit: contain;
             background: #050505;
+            transition: background 0.8s ease;
         }
 
         .image-placeholder {
@@ -334,6 +416,7 @@
             padding: 0.8vw 2vw;
             gap: 1.5vw;
             flex-shrink: 0;
+            transition: background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease;
         }
 
         .qr-text {
@@ -341,7 +424,7 @@
             font-weight: 900;
             text-align: right;
             line-height: 1.2;
-            color: #fff;
+            color: var(--text-white);
             flex: 1;
             letter-spacing: 0.5px;
         }
@@ -495,8 +578,27 @@
         document.getElementById('today-date').textContent = capitalizeFirst(dateText);
     }
 
+    function updateThemeByTime() {
+        const now = new Date();
+
+        const hourText = new Intl.DateTimeFormat('et-EE', {
+            hour: '2-digit',
+            hour12: false,
+            timeZone: TIME_ZONE
+        }).format(now);
+
+        const hour = Number(hourText.replace(/\D/g, ''));
+        const isDay = hour >= 7 && hour < 21;
+
+        document.body.classList.toggle('theme-day', isDay);
+        document.body.classList.toggle('theme-night', !isDay);
+    }
+
     setInterval(updateClock, 1000);
+    setInterval(updateThemeByTime, 60000);
+
     updateClock();
+    updateThemeByTime();
 
     function formatIsoDate(startIso, endIso) {
         const start = parseDate(startIso);
@@ -766,7 +868,9 @@
                     <div class="hero-date-tag">${date}</div>
                     <h2 class="hero-title">${title}</h2>
                     <div class="hero-loc">📍 ${loc}</div>
-                    <div class="hero-desc">${desc}</div>
+                    <div class="hero-desc">
+                        <span class="hero-desc-inner">${desc}</span>
+                    </div>
                 </div>
 
                 <div class="hero-visual">
@@ -781,10 +885,43 @@
             `;
 
             updateQrCode(ev.url);
+            startDescriptionScroll();
 
             inner.style.opacity = 1;
             inner.style.transform = 'translateY(0)';
         }, 300);
+    }
+
+    function startDescriptionScroll() {
+        const box = document.querySelector('.hero-desc');
+        const inner = document.querySelector('.hero-desc-inner');
+
+        if (!box || !inner) {
+            return;
+        }
+
+        inner.classList.remove('scroll-needed');
+        inner.style.animationDuration = '';
+        inner.style.setProperty('--scroll-distance', '0px');
+
+        requestAnimationFrame(() => {
+            const overflow = inner.scrollHeight - box.clientHeight;
+
+            if (overflow <= 8) {
+                return;
+            }
+
+            const pauseStart = 2500;
+            const pauseEnd = 2000;
+            const availableTime = Math.max(ROTATE_INTERVAL - pauseStart - pauseEnd, 4000);
+
+            inner.style.setProperty('--scroll-distance', `-${overflow}px`);
+            inner.style.animationDuration = `${availableTime}ms`;
+
+            setTimeout(() => {
+                inner.classList.add('scroll-needed');
+            }, pauseStart);
+        });
     }
 
     function updateQrCode(url) {
