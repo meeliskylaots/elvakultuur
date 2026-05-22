@@ -91,10 +91,6 @@
             opacity: 0.25;
         }
 
-        body.theme-day .qr-box {
-            border: 1px solid rgba(15, 23, 42, 0.12);
-        }
-
         body.theme-night {
             --bg-black: #000000;
             --card-black: #080808;
@@ -260,6 +256,7 @@
         .hero-desc-inner {
             display: block;
             will-change: transform;
+            white-space: pre-line;
         }
 
         .hero-desc-inner.scroll-needed {
@@ -550,7 +547,7 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
 
-    const ROTATE_INTERVAL = 15000;
+    const ROTATE_INTERVAL = 22000;
     const RELOAD_INTERVAL = 1800000;
     const TIME_ZONE = "Europe/Tallinn";
 
@@ -905,22 +902,24 @@
         inner.style.setProperty('--scroll-distance', '0px');
 
         requestAnimationFrame(() => {
-            const overflow = inner.scrollHeight - box.clientHeight;
+            requestAnimationFrame(() => {
+                const overflow = inner.scrollHeight - box.clientHeight;
 
-            if (overflow <= 8) {
-                return;
-            }
+                if (overflow <= 8) {
+                    return;
+                }
 
-            const pauseStart = 2500;
-            const pauseEnd = 2000;
-            const availableTime = Math.max(ROTATE_INTERVAL - pauseStart - pauseEnd, 4000);
+                const pauseStart = 1800;
+                const pauseEnd = 1200;
+                const availableTime = Math.max(ROTATE_INTERVAL - pauseStart - pauseEnd, 3000);
 
-            inner.style.setProperty('--scroll-distance', `-${overflow}px`);
-            inner.style.animationDuration = `${availableTime}ms`;
+                inner.style.setProperty('--scroll-distance', `-${overflow}px`);
+                inner.style.animationDuration = `${availableTime}ms`;
 
-            setTimeout(() => {
-                inner.classList.add('scroll-needed');
-            }, pauseStart);
+                setTimeout(() => {
+                    inner.classList.add('scroll-needed');
+                }, pauseStart);
+            });
         });
     }
 
