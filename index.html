@@ -12,7 +12,6 @@
         :root {
             --elva-blue: #315efb;
             --elva-blue-dark: #2147d9;
-            --elva-blue-soft: rgba(49, 94, 251, 0.14);
             --accent-green: #22c55e;
 
             --bg-black: #05070c;
@@ -70,16 +69,6 @@
             text-shadow: none;
         }
 
-        body.theme-night {
-            --bg-black: #05070c;
-            --card-black: rgba(10, 14, 24, 0.88);
-            --card-elevated: rgba(15, 20, 34, 0.88);
-            --text-white: #ffffff;
-            --muted: #9fb0c9;
-            --soft-text: #d7e1f1;
-            --border: rgba(255, 255, 255, 0.12);
-        }
-
         #ambient-bg {
             position: fixed;
             inset: 0;
@@ -104,8 +93,6 @@
             justify-content: space-between;
             padding-top: 2vh;
             flex-shrink: 0;
-            position: relative;
-            z-index: 50;
         }
 
         .header-left {
@@ -137,213 +124,6 @@
             letter-spacing: 2.2px;
             color: var(--text-white);
             opacity: 0.92;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 2vw;
-            position: relative;
-        }
-
-        .audio-wrapper {
-            position: relative;
-        }
-
-        .audio-btn {
-            background: var(--card-elevated);
-            border: 1px solid var(--border);
-            color: var(--text-white);
-            padding: 0.7vw 1.4vw;
-            border-radius: 50px;
-            font-family: inherit;
-            font-size: 1vw;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 0.7vw;
-            cursor: pointer;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-            transition: all 0.3s ease;
-        }
-
-        .audio-btn:hover {
-            background: var(--elva-blue);
-            border-color: var(--elva-blue-dark);
-            color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        .audio-btn.playing {
-            background: rgba(34, 197, 94, 0.16);
-            border-color: rgba(34, 197, 94, 0.5);
-            color: var(--accent-green);
-        }
-
-        .audio-btn-icon {
-            font-size: 1.2vw;
-            line-height: 1;
-        }
-
-        .audio-popover {
-            position: absolute;
-            top: 110%;
-            right: 0;
-            width: 22vw;
-            min-width: 280px;
-            background: var(--card-elevated);
-            border: 1px solid var(--border);
-            border-radius: 1.5vw;
-            padding: 1.5vw;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 1.2vw;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px) scale(0.95);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none;
-        }
-
-        .audio-popover.open {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-
-        .popover-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.8vw;
-        }
-
-        .popover-title {
-            font-size: 0.95vw;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--soft-text);
-        }
-
-        .track-info-box {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
-            border-radius: 0.8vw;
-            padding: 0.8vw;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5vw;
-        }
-
-        .track-label {
-            font-size: 0.75vw;
-            color: var(--muted);
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-        .track-name {
-            font-size: 0.95vw;
-            font-weight: 800;
-            color: var(--text-white);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .playlist-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1vw;
-            margin-top: 0.2vw;
-        }
-
-        .control-subbtn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--border);
-            color: var(--text-white);
-            width: 2.2vw;
-            height: 2.2vw;
-            min-width: 32px;
-            min-height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.9vw;
-            transition: all 0.2s ease;
-        }
-
-        .control-subbtn:hover {
-            background: var(--elva-blue);
-            border-color: var(--elva-blue-dark);
-            transform: scale(1.08);
-        }
-
-        .control-subbtn.play-toggle {
-            width: 2.8vw;
-            height: 2.8vw;
-            min-width: 40px;
-            min-height: 40px;
-            background: var(--elva-blue);
-            font-size: 1.1vw;
-        }
-
-        .volume-row {
-            display: flex;
-            align-items: center;
-            gap: 0.8vw;
-        }
-
-        .volume-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            flex: 1;
-            height: 0.5vw;
-            min-height: 6px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            cursor: pointer;
-        }
-
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 1.2vw;
-            height: 1.2vw;
-            min-width: 16px;
-            min-height: 16px;
-            border-radius: 50%;
-            background: var(--elva-blue);
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            transition: transform 0.2s ease, background 0.2s ease;
-        }
-
-        .volume-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            background: var(--elva-blue-dark);
-        }
-
-        .volume-value-text {
-            font-size: 0.9vw;
-            font-weight: 800;
-            min-width: 2.8vw;
-            text-align: right;
-            color: var(--soft-text);
-            font-variant-numeric: tabular-nums;
         }
 
         .clock-section {
@@ -384,27 +164,9 @@
             position: relative;
             display: flex;
             overflow: hidden;
-            box-shadow:
-                0 24px 64px rgba(15, 23, 42, 0.16),
-                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+            box-shadow: 0 24px 64px rgba(15, 23, 42, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.22);
             min-height: 0;
             transition: background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease;
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(135deg, rgba(49, 94, 251, 0.05), transparent 30%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 25%);
-            pointer-events: none;
-        }
-
-        body.theme-day .hero {
-            box-shadow:
-                0 26px 60px rgba(27, 44, 85, 0.12),
-                inset 0 1px 0 rgba(255,255,255,0.66);
         }
 
         .progress-bar {
@@ -415,7 +177,6 @@
             background: linear-gradient(90deg, var(--elva-blue), #567dff);
             width: 0;
             z-index: 10;
-            box-shadow: 0 0 14px rgba(49, 94, 251, 0.24);
         }
 
         #hero-inner {
@@ -514,37 +275,6 @@
             background: transparent;
         }
 
-        .visual-stage::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: var(--event-image);
-            background-size: cover;
-            background-position: center;
-            filter: blur(26px) saturate(1.08);
-            transform: scale(1.18);
-            opacity: 0.26;
-            z-index: 0;
-        }
-
-        .visual-stage::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.16), transparent 66%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        body.theme-night .visual-stage::before {
-            opacity: 0.34;
-            filter: blur(28px) saturate(1.18) brightness(0.9);
-        }
-
-        body.theme-night .visual-stage::after {
-            background: radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 66%);
-        }
-
         .hero-image {
             position: relative;
             z-index: 2;
@@ -552,28 +282,6 @@
             height: 100%;
             object-fit: contain;
             background: transparent;
-            filter: drop-shadow(0 18px 30px rgba(15, 23, 42, 0.16));
-        }
-
-        .image-placeholder {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            height: 100%;
-            border-radius: 1.2vw;
-            background: linear-gradient(135deg, rgba(49, 94, 251, 0.08), rgba(255,255,255,0.18));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(19, 33, 59, 0.24);
-            font-size: 3vw;
-            font-weight: 900;
-            letter-spacing: 0.2vw;
-        }
-
-        body.theme-night .image-placeholder {
-            background: linear-gradient(135deg, rgba(49, 94, 251, 0.12), rgba(255,255,255,0.04));
-            color: rgba(255,255,255,0.18);
         }
 
         .bottom-section {
@@ -602,24 +310,19 @@
             height: 100%;
             background: var(--card-elevated);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border);
             border-radius: 1.35vw;
             display: flex;
             align-items: center;
             padding: 1vw;
             gap: 1.2vw;
-            transition: all 0.36s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             overflow: hidden;
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
         }
 
         .event-card.active {
             border: 2px solid rgba(49, 94, 251, 0.78);
             background: linear-gradient(180deg, rgba(49, 94, 251, 0.10), rgba(49, 94, 251, 0.06));
-            transform: translateY(-3px);
-            box-shadow: 0 12px 26px rgba(49, 94, 251, 0.14), inset 0 1px 0 rgba(255,255,255,0.38);
         }
 
         .event-card-img {
@@ -627,12 +330,8 @@
             height: 4.5vw;
             border-radius: 0.78vw;
             object-fit: cover;
-            background: #dfe7f4;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         }
-
-        .event-card-img.hidden { display: none; }
 
         .event-card-info {
             overflow: hidden;
@@ -648,7 +347,6 @@
             color: var(--elva-blue);
             font-weight: 800;
             text-transform: uppercase;
-            white-space: nowrap;
         }
 
         .event-card-title {
@@ -664,7 +362,6 @@
             width: 25vw;
             background: var(--card-elevated);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border);
             border-radius: 1.7vw;
             display: flex;
@@ -673,8 +370,6 @@
             padding: 0.8vw 1.6vw 0.8vw 2vw;
             gap: 1.3vw;
             flex-shrink: 0;
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-            transition: background 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease;
         }
 
         .qr-text {
@@ -684,7 +379,6 @@
             line-height: 1.15;
             color: var(--text-white);
             flex: 1;
-            letter-spacing: 0.5px;
         }
 
         .qr-box {
@@ -696,96 +390,80 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
             flex-shrink: 0;
         }
 
-        #qr-target img,
-        #qr-target canvas {
+        #qr-target img, #qr-target canvas {
             max-width: 100%;
             max-height: 100%;
         }
 
-        #heli-overlay {
+        /* HELI OVERLAY DIALOOG */
+        .heli-overlay {
             position: fixed;
             inset: 0;
             background: rgba(5, 7, 12, 0.88);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 200;
+            z-index: 1000;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 3vw;
-            text-align: center;
         }
 
-        .heli-box {
+        .heli-modal {
             background: var(--card-elevated);
             border: 1px solid var(--border);
-            padding: 3.5vw 4vw;
-            border-radius: 2.5vw;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-            max-width: 45vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2vh;
+            padding: 3vw;
+            border-radius: 2vw;
+            text-align: center;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .heli-title {
-            font-size: 2.2vw;
+        .heli-modal h2 {
+            font-size: 1.8vw;
             font-weight: 900;
-            color: var(--text-white);
-            line-height: 1.2;
-        }
-
-        .heli-sub {
-            font-size: 1.2vw;
-            color: var(--muted);
-            font-weight: 600;
             margin-bottom: 1.5vh;
+            color: #fff;
         }
 
-        .heli-buttons {
+        .heli-modal p {
+            font-size: 1vw;
+            color: var(--muted);
+            margin-bottom: 3.5vh;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .heli-actions {
             display: flex;
-            gap: 1.5vw;
-            width: 100%;
+            gap: 1vw;
             justify-content: center;
         }
 
-        .heli-btn-primary, .heli-btn-secondary {
-            padding: 1vw 2.2vw;
+        .btn-heli {
+            padding: 1vw 2vw;
             border-radius: 50px;
-            font-family: inherit;
-            font-size: 1.1vw;
             font-weight: 800;
+            font-size: 1vw;
             cursor: pointer;
-            transition: all 0.3s ease;
             border: none;
+            transition: all 0.2s ease;
         }
 
-        .heli-btn-primary {
-            background: linear-gradient(180deg, var(--elva-blue), var(--elva-blue-dark));
-            color: #ffffff;
-            box-shadow: 0 10px 24px rgba(49, 94, 251, 0.35);
+        .btn-heli-primary {
+            background: var(--elva-blue);
+            color: #fff;
         }
 
-        .heli-btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 14px 30px rgba(49, 94, 251, 0.5);
+        .btn-heli-primary:hover {
+            background: var(--elva-blue-dark);
+            transform: scale(1.03);
         }
 
-        .heli-btn-secondary {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--muted);
-        }
-
-        .heli-btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-white);
+        .btn-heli-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--soft-text);
         }
 
         .loader {
@@ -801,61 +479,31 @@
             color: var(--elva-blue);
             flex-direction: column;
             text-align: center;
-            padding: 4vw;
-        }
-
-        .error-details {
-            font-size: 1.2vw;
-            color: #64748b;
-            margin-top: 2vh;
-            font-weight: 600;
-            text-align: center;
-            max-width: 60vw;
-            line-height: 1.4;
-        }
-
-        @media (max-width: 900px) {
-            :root {
-                --safe-area: 4vw;
-                --header-h: 12vh;
-                --ticker-h: 18vh;
-            }
-
-            .hero-title { font-size: 5vw; }
-            .hero-loc, .hero-desc { font-size: 2.4vw; }
-            .hero-date-tag { font-size: 2vw; }
-            .event-card { flex-basis: 42vw; }
-            .qr-area { width: 30vw; }
-            .heli-box { max-width: 80vw; padding: 6vw; }
-            .heli-title { font-size: 4vw; }
-            .heli-sub { font-size: 2.5vw; }
-            .heli-btn-primary, .heli-btn-secondary { font-size: 2.5vw; padding: 2vw 4vw; }
-            .audio-popover { width: 80vw; right: -10vw; }
         }
     </style>
 </head>
 
 <body>
 
-<div id="ambient-bg"></div>
-
 <audio id="taustamuusika" preload="auto"></audio>
 
-<div id="heli-overlay">
-    <div class="heli-box">
-        <div style="font-size: 3vw; margin-bottom: 0.5vh;">🎵</div>
-        <div class="heli-title">KAS KÄIVITADA TAUSTAMUUSIKA?</div>
-        <div class="heli-sub">Kultuuriekraan pakub meeldivat taustamuusikat sündmuste sirvimisel</div>
-        <div class="heli-buttons">
-            <button class="heli-btn-primary" onclick="enableAudioAndStart()">JAH, KÄIVITA HELI</button>
-            <button class="heli-btn-secondary" onclick="disableAudio()">EI SOOVI HELI</button>
+<div id="ambient-bg"></div>
+
+<!-- TAUSTAHELI KÜSIME DIALOOG -->
+<div id="heli-overlay" class="heli-overlay">
+    <div class="heli-modal">
+        <h2>TAUSTAMUUSIKA</h2>
+        <p>Kas soovite käivitada ekraani taustamuusika (tugevus 1%)?</p>
+        <div class="heli-actions">
+            <button class="btn-heli btn-heli-primary" onclick="enableAudioAndStart()">JAH, KÄIVITA HELI</button>
+            <button class="btn-heli btn-heli-secondary" onclick="disableAudio()">EI SOOVI HELI</button>
         </div>
     </div>
 </div>
 
 <div id="loader" class="loader">
     LAEN ANDMEID...
-    <div id="loader-error" class="error-details">Ootan Kultuuriakna värskeid sündmusi</div>
+    <div id="loader-error" style="font-size: 1.2vw; color: #64748b; margin-top: 2vh;">Ootan Kultuuriakna värskeid sündmusi</div>
 </div>
 
 <header>
@@ -864,47 +512,9 @@
         <h1 class="header-title">Kultuuriekraan</h1>
     </div>
 
-    <div class="header-right">
-        <div class="audio-wrapper">
-            <button id="taustaheli-main-btn" class="audio-btn" onclick="toggleAudioPopover(event)">
-                <span id="audio-btn-icon" class="audio-btn-icon">🎵</span>
-                <span id="audio-btn-text">Taustaheli</span>
-            </button>
-
-            <div id="audio-popover" class="audio-popover" onclick="event.stopPropagation()">
-                <div class="popover-header">
-                    <span class="popover-title">Taustaheli seadistus</span>
-                    <span id="popover-status-badge" style="font-size: 0.8vw; font-weight: 800; color: var(--accent-green);">Aktiivne</span>
-                </div>
-
-                <div class="track-info-box">
-                    <span class="track-label">Praegune lugu</span>
-                    <span id="track-name" class="track-name">Rahulik klaverimeloodia</span>
-                    
-                    <div class="playlist-controls">
-                        <button class="control-subbtn" onclick="playPrevTrack()" title="Eelmine lugu">⏮</button>
-                        <button id="popover-play-btn" class="control-subbtn play-toggle" onclick="toggleAudio()" title="Mängi / Paus">⏸</button>
-                        <button class="control-subbtn" onclick="playNextTrack()" title="Järgmine lugu">⏭</button>
-                    </div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 0.4vw;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="track-label">Helitugevus</span>
-                        <span id="volume-text" class="volume-value-text">1%</span>
-                    </div>
-                    <div class="volume-row">
-                        <span id="volume-icon" style="font-size: 1.1vw;">🔈</span>
-                        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="1" oninput="changeVolume(this.value)" aria-label="Helitugevus">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="clock-section">
-            <div class="clock" id="clock">00:00</div>
-            <div class="date-today" id="today-date">...</div>
-        </div>
+    <div class="clock-section">
+        <div class="clock" id="clock">00:00</div>
+        <div class="date-today" id="today-date">...</div>
     </div>
 </header>
 
@@ -926,633 +536,215 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaYCMKGMsPR9cUHjhmj-MjSM2GilGQU0SZbetueLa7RxGr-ZAC8U6gCe1gf5VTqNDt/exec";
-
     const BASE_ROTATE_INTERVAL = 20000;
-    const SCROLL_SPEED_PX_PER_SEC = 28;
-    const MAX_SLIDE_TIME = 45000;
+    const PIXELS_PER_SECOND = 28;
     const RELOAD_INTERVAL = 1800000;
     const TIME_ZONE = "Europe/Tallinn";
 
     let events = [];
     let currentIndex = 0;
     let rotationTimer = null;
-    let isLoading = false;
 
-    // --- AUDIO ESITUSLOEND & OLEK ---
-    let audioState = {
-        enabled: true,
-        playing: false,
-        volume: 0.01,
-        currentTrackIndex: 0
-    };
-
+    // -------- TAUSTAMUUSIKA (1% HELITUGEVUS & PLAYLIST LOOP) --------
     const playlist = [
-        { name: "Rahulik klaverimeloodia", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" },
-        { name: "Sügisene ambient", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3" },
-        { name: "Aeglane unistus", src: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_3d25d8868f.mp3" }
+      "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
+      "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3",
+      "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3"
     ];
+    let currentTrackIndex = 0;
+    let audioEnabled = false;
 
     function initAudio() {
-        const audio = document.getElementById('taustamuusika');
-        if (audio) {
-            audio.addEventListener('ended', () => {
-                playNextTrack();
-            });
-        }
-        const slider = document.getElementById('volume-slider');
-        if (slider) {
-            slider.value = 1;
-        }
-        changeVolume(1);
+        const audio = document.getElementById("taustamuusika");
+        if (!audio) return;
+        audio.volume = 0.01; // Fikseeritud 1% helitugevus
+
+        audio.onended = function() {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+            playCurrentTrack();
+        };
+    }
+
+    function playCurrentTrack() {
+        const audio = document.getElementById("taustamuusika");
+        if (!audio || !audioEnabled) return;
+        
+        audio.src = playlist[currentTrackIndex];
+        audio.volume = 0.01;
+        audio.play().catch(e => console.warn("Heli mängimine takistatud:", e));
     }
 
     function enableAudioAndStart() {
-        audioState.enabled = true;
-        audioState.playing = true;
-        applyAudioSettings();
-        const overlay = document.getElementById('heli-overlay');
-        if (overlay) overlay.style.display = 'none';
+        audioEnabled = true;
+        document.getElementById("heli-overlay").style.display = "none";
+        initAudio();
+        playCurrentTrack();
     }
 
     function disableAudio() {
-        audioState.enabled = false;
-        audioState.playing = false;
-        applyAudioSettings();
-        const overlay = document.getElementById('heli-overlay');
-        if (overlay) overlay.style.display = 'none';
+        audioEnabled = false;
+        document.getElementById("heli-overlay").style.display = "none";
     }
 
-    function toggleAudioPopover(e) {
-        if (e) e.stopPropagation();
-        const popover = document.getElementById('audio-popover');
-        if (popover) {
-            popover.classList.toggle('open');
-        }
-    }
-
-    function toggleAudio() {
-        audioState.playing = !audioState.playing;
-        if (audioState.playing) audioState.enabled = true;
-        applyAudioSettings();
-    }
-
-    function playNextTrack() {
-        audioState.currentTrackIndex = (audioState.currentTrackIndex + 1) % playlist.length;
-        audioState.playing = true;
-        applyAudioSettings();
-    }
-
-    function playPrevTrack() {
-        audioState.currentTrackIndex = (audioState.currentTrackIndex - 1 + playlist.length) % playlist.length;
-        audioState.playing = true;
-        applyAudioSettings();
-    }
-
-    function changeVolume(val) {
-        const vol = parseFloat(val) / 100;
-        audioState.volume = vol;
-        
-        const volText = document.getElementById('volume-text');
-        if (volText) volText.textContent = `${Math.round(val)}%`;
-        
-        const volIcon = document.getElementById('volume-icon');
-        if (volIcon) {
-            if (val == 0) volIcon.textContent = '🔇';
-            else if (val < 30) volIcon.textContent = '🔈';
-            else if (val < 70) volIcon.textContent = '🔉';
-            else volIcon.textContent = '🔊';
-        }
-
-        const audio = document.getElementById('taustamuusika');
-        if (audio) audio.volume = audioState.volume;
-
-        if (val > 0 && !audioState.playing && audioState.enabled) {
-            audioState.playing = true;
-            applyAudioSettings();
-        }
-    }
-
-    function applyAudioSettings() {
-        const audio = document.getElementById('taustamuusika');
-        const track = playlist[audioState.currentTrackIndex];
-        const trackNameEl = document.getElementById('track-name');
-
-        if (trackNameEl) trackNameEl.textContent = track ? track.name : 'Tundmatu lugu';
-
-        if (!audio) return;
-
-        audio.volume = audioState.volume;
-
-        if (track && audio.getAttribute('data-src') !== track.src) {
-            audio.setAttribute('data-src', track.src);
-            audio.src = track.src;
-            audio.load();
-        }
-
-        if (audioState.playing && audioState.enabled) {
-            const p = audio.play();
-            if (p && typeof p.then === 'function') {
-                p.catch(() => {
-                    audioState.playing = false;
-                    updateAudioUI();
-                });
-            }
-        } else {
-            audio.pause();
-        }
-        updateAudioUI();
-    }
-
-    function updateAudioUI() {
-        const playBtn = document.getElementById('popover-play-btn');
-        const mainBtn = document.getElementById('taustaheli-main-btn');
-        const badge = document.getElementById('popover-status-badge');
-
-        if (playBtn) playBtn.textContent = audioState.playing ? '⏸' : '▶';
-        if (badge) {
-            badge.textContent = audioState.playing ? 'Mängib' : 'Pausil';
-            badge.style.color = audioState.playing ? 'var(--accent-green)' : 'var(--muted)';
-        }
-        if (mainBtn) {
-            if (audioState.playing) {
-                mainBtn.classList.add('playing');
-            } else {
-                mainBtn.classList.remove('playing');
-            }
-        }
-    }
-
-    // Close popover when clicking outside
-    document.addEventListener('click', (e) => {
-        const popover = document.getElementById('audio-popover');
-        const btn = document.getElementById('taustaheli-main-btn');
-        if (popover && popover.classList.contains('open') && !popover.contains(e.target) && !btn.contains(e.target)) {
-            popover.classList.remove('open');
-        }
-    });
-
-    document.addEventListener("keydown", function() {
-        const ov = document.getElementById("heli-overlay");
-        if (ov && ov.style.display !== "none") {
-            enableAudioAndStart();
-        }
-    });
-
+    // -------- KELL & TEEMA --------
     function updateClock() {
         const now = new Date();
+        document.getElementById('clock').textContent = new Intl.DateTimeFormat('et-EE', {
+            hour: '2-digit', minute: '2-digit', timeZone: TIME_ZONE
+        }).format(now);
 
-        const clockEl = document.getElementById('clock');
-        if (clockEl) {
-            clockEl.textContent = new Intl.DateTimeFormat('et-EE', {
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: TIME_ZONE
-            }).format(now);
-        }
+        const dateText = new Intl.DateTimeFormat('et-EE', {
+            weekday: 'long', day: 'numeric', month: 'long', timeZone: TIME_ZONE
+        }).format(now);
 
-        const dateEl = document.getElementById('today-date');
-        if (dateEl) {
-            const dateText = new Intl.DateTimeFormat('et-EE', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                timeZone: TIME_ZONE
-            }).format(now);
-
-            dateEl.textContent = capitalizeFirst(dateText);
-        }
+        document.getElementById('today-date').textContent = dateText.charAt(0).toUpperCase() + dateText.slice(1);
     }
 
     function updateThemeByTime() {
-        const now = new Date();
-
-        const hourText = new Intl.DateTimeFormat('et-EE', {
-            hour: '2-digit',
-            hour12: false,
-            timeZone: TIME_ZONE
-        }).format(now);
-
-        const hour = Number(hourText.replace(/\D/g, ''));
+        const hour = Number(new Intl.DateTimeFormat('et-EE', { hour: '2-digit', hour12: false, timeZone: TIME_ZONE }).format(new Date()).replace(/\D/g, ''));
         const isDay = hour >= 7 && hour < 21;
-
         document.body.classList.toggle('theme-day', isDay);
-        document.body.classList.toggle('theme-night', !isDay);
     }
 
     setInterval(updateClock, 1000);
     setInterval(updateThemeByTime, 60000);
+    updateClock();
+    updateThemeByTime();
 
-    function formatIsoDate(startIso, endIso) {
-        const start = parseDate(startIso);
-
-        if (!start) {
-            return "Kuupäev puudub";
-        }
-
-        const weekday = new Intl.DateTimeFormat('et-EE', {
-            weekday: 'long',
-            timeZone: TIME_ZONE
-        }).format(start);
-
-        const day = new Intl.DateTimeFormat('et-EE', {
-            day: 'numeric',
-            timeZone: TIME_ZONE
-        }).format(start);
-
-        const month = new Intl.DateTimeFormat('et-EE', {
-            month: 'long',
-            timeZone: TIME_ZONE
-        }).format(start);
-
-        const time = new Intl.DateTimeFormat('et-EE', {
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: TIME_ZONE
-        }).format(start);
-
-        return `${capitalizeFirst(weekday)}, ${day}. ${month} | kell ${time}`;
-    }
-
-    function formatCardDate(startIso, endIso) {
-        const start = parseDate(startIso);
-
-        if (!start) {
-            return "Aeg puudub";
-        }
-
-        const date = new Intl.DateTimeFormat('et-EE', {
-            day: 'numeric',
-            month: 'short',
-            timeZone: TIME_ZONE
-        }).format(start);
-
-        const time = new Intl.DateTimeFormat('et-EE', {
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: TIME_ZONE
-        }).format(start);
-
-        return `${date} · ${time}`;
-    }
-
-    function parseDate(isoString) {
-        if (!isoString) {
-            return null;
-        }
-
-        const d = new Date(isoString);
-
-        if (isNaN(d.getTime())) {
-            return null;
-        }
-
-        return d;
-    }
-
+    // -------- SÜNDMUSED & LOOGIKA --------
     async function loadData() {
-        if (isLoading) {
-            return;
-        }
-
-        isLoading = true;
-
         try {
-            const res = await fetch(`${SCRIPT_URL}?format=json&t=${Date.now()}`, {
-                method: 'GET',
-                cache: 'no-store'
-            });
-
-            const text = await res.text();
-
-            if (text.trim().startsWith('<')) {
-                throw new Error("Google Script tagastas HTML-i, mitte JSON-i.");
-            }
-
-            const data = JSON.parse(text);
-
+            const res = await fetch(`${SCRIPT_URL}?format=json&t=${Date.now()}`, { cache: 'no-store' });
+            const data = await res.json();
             if (data.ok && Array.isArray(data.events) && data.events.length > 0) {
-                events = normalizeEvents(data.events);
-                currentIndex = currentIndex % events.length;
-
-                const loader = document.getElementById('loader');
-                if (loader) delete loader.dataset.customError;
+                events = data.events;
             } else {
                 events = [];
             }
-
         } catch (e) {
-            console.error("Viga laadimisel:", e);
             events = [];
-            showLoaderMessage(
-                "ANDMEID EI ÕNNESTUNUD LAADIDA",
-                "Kontrolli, kas Google Apps Scripti veebirakendus on avaldatud ja tagastab ?format=json päringule JSON-andmed."
-            );
-        } finally {
-            isLoading = false;
         }
-
         processData();
-    }
-
-    function normalizeEvents(rawEvents) {
-        return rawEvents
-            .filter(ev => ev && ev.startIso)
-            .map(ev => ({
-                title: String(ev.title || "Üritus"),
-                startIso: String(ev.startIso || ""),
-                endIso: String(ev.endIso || ev.startIso || ""),
-                loc: String(ev.loc || "Elva vald"),
-                desc: String(ev.desc || ""),
-                img: String(ev.img || ""),
-                url: String(ev.url || "https://kultuuriaken.tartu.ee")
-            }))
-            .sort((a, b) => new Date(a.startIso) - new Date(b.startIso));
     }
 
     function processData() {
         const loader = document.getElementById('loader');
         const appMain = document.getElementById('app-main');
 
-        if (events && events.length > 0) {
-            if (loader) loader.style.display = 'none';
-            if (appMain) appMain.style.visibility = 'visible';
-
+        if (events.length > 0) {
+            loader.style.display = 'none';
+            appMain.style.visibility = 'visible';
             renderTicker();
             showEvent(currentIndex || 0);
-
         } else {
-            if (appMain) appMain.style.visibility = 'hidden';
-
-            if (loader && !loader.dataset.customError) {
-                showLoaderMessage(
-                    "HETKEL ÜRITUSI EI OLE",
-                    "Kultuuriaknas Elva valla järgmise kuu sündmused hetkel puuduvad."
-                );
-            }
-
-            if (loader) loader.style.display = 'flex';
-            stopRotation();
-        }
-    }
-
-    function startRotation(customDelay) {
-        stopRotation();
-
-        const delay = customDelay || BASE_ROTATE_INTERVAL;
-
-        rotationTimer = setTimeout(() => {
-            if (!events || events.length === 0) return;
-
-            currentIndex = (currentIndex + 1) % events.length;
-            showEvent(currentIndex);
-        }, delay);
-    }
-
-    function stopRotation() {
-        if (rotationTimer) {
-            clearTimeout(rotationTimer);
-            rotationTimer = null;
+            appMain.style.visibility = 'hidden';
+            loader.style.display = 'flex';
         }
     }
 
     function renderTicker() {
         const ticker = document.getElementById('ticker-scroll');
-        if (!ticker) return;
-
-        ticker.innerHTML = events.map((ev, i) => {
-            const img = escapeAttribute(ev.img);
-            const title = escapeHtml(ev.title);
-            const cardDate = escapeHtml(formatCardDate(ev.startIso, ev.endIso));
-
-            return `
-                <div class="event-card" id="card-${i}" data-index="${i}" role="button" tabindex="0">
-                    ${img ? `<img src="${img}" class="event-card-img" alt="" onerror="this.classList.add('hidden')">` : ''}
-                    <div class="event-card-info">
-                        <div class="event-card-date">${cardDate}</div>
-                        <div class="event-card-title">${title}</div>
-                    </div>
+        ticker.innerHTML = events.map((ev, i) => `
+            <div class="event-card" id="card-${i}" onclick="currentIndex=${i}; showEvent(${i});">
+                ${ev.img ? `<img src="${ev.img}" class="event-card-img">` : ''}
+                <div class="event-card-info">
+                    <div class="event-card-date">${formatCardDate(ev.startIso)}</div>
+                    <div class="event-card-title">${ev.title || 'Üritus'}</div>
                 </div>
-            `;
-        }).join('');
-
-        document.querySelectorAll('.event-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const idx = Number(card.dataset.index);
-                currentIndex = idx;
-                showEvent(idx);
-                startRotation();
-            });
-
-            card.addEventListener('keydown', event => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    const idx = Number(card.dataset.index);
-                    currentIndex = idx;
-                    showEvent(idx);
-                    startRotation();
-                }
-            });
-        });
+            </div>
+        `).join('');
     }
 
     function showEvent(idx) {
         if (!events || events.length === 0) return;
-
-        if (idx < 0 || idx >= events.length) idx = 0;
-
         currentIndex = idx;
-
         const ev = events[idx];
         const inner = document.getElementById('hero-inner');
-        const progressBar = document.getElementById('progress-bar');
-
-        if (!inner) return;
 
         inner.style.opacity = 0;
-        inner.style.transform = 'translateY(15px)';
 
         setTimeout(() => {
-            document.querySelectorAll('.event-card').forEach(card => {
-                card.classList.remove('active');
-            });
-
+            document.querySelectorAll('.event-card').forEach(c => c.classList.remove('active'));
             const activeCard = document.getElementById(`card-${idx}`);
-
             if (activeCard) {
                 activeCard.classList.add('active');
-                activeCard.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest',
-                    inline: 'center'
-                });
+                activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
-
-            const bgEl = document.getElementById('ambient-bg');
-            if (bgEl) {
-                if (ev.img) {
-                    bgEl.style.backgroundImage = `url("${escapeCssUrl(ev.img)}")`;
-                } else {
-                    bgEl.style.backgroundImage = 'none';
-                }
-            }
-
-            const title = escapeHtml(ev.title || "Pealkiri puudub");
-            const loc = escapeHtml(ev.loc || "Elva vald");
-            const desc = escapeHtml(ev.desc || "");
-            const img = escapeAttribute(ev.img || "");
-            const date = escapeHtml(formatIsoDate(ev.startIso, ev.endIso));
-            const visualBg = escapeCssUrl(ev.img || "");
 
             inner.innerHTML = `
                 <div class="hero-info">
-                    <div class="hero-date-tag">${date}</div>
-                    <h2 class="hero-title">${title}</h2>
-                    <div class="hero-loc">📍 ${loc}</div>
-                    <div class="hero-desc">
-                        <span class="hero-desc-inner">${desc}</span>
-                    </div>
+                    <div class="hero-date-tag">${formatIsoDate(ev.startIso)}</div>
+                    <h2 class="hero-title">${ev.title || ''}</h2>
+                    <div class="hero-loc">📍 ${ev.loc || 'Elva vald'}</div>
+                    <div class="hero-desc"><span class="hero-desc-inner">${ev.desc || ''}</span></div>
                 </div>
-
                 <div class="hero-visual">
-                    <div class="visual-stage" style="--event-image: url('${visualBg}')">
-                        ${
-                            img
-                                ? `<img src="${img}" class="hero-image" alt="" onerror="this.outerHTML='<div class=&quot;image-placeholder&quot;>ELVA</div>'">`
-                                : `<div class="image-placeholder">ELVA</div>`
-                        }
+                    <div class="visual-stage">
+                        ${ev.img ? `<img src="${ev.img}" class="hero-image">` : ''}
                     </div>
                 </div>
             `;
 
             updateQrCode(ev.url);
-            
-            // Calculate description scroll duration dynamically
-            const requiredSlideTime = calculateAndApplyDescriptionScroll(progressBar);
-
+            calculateAndStartRotation();
             inner.style.opacity = 1;
-            inner.style.transform = 'translateY(0)';
-
-            startRotation(requiredSlideTime);
         }, 300);
     }
 
-    function calculateAndApplyDescriptionScroll(progressBar) {
+    function calculateAndStartRotation() {
+        if (rotationTimer) clearTimeout(rotationTimer);
+
         const box = document.querySelector('.hero-desc');
         const inner = document.querySelector('.hero-desc-inner');
+        let duration = BASE_ROTATE_INTERVAL;
 
-        let totalSlideTime = BASE_ROTATE_INTERVAL;
+        if (box && inner) {
+            const overflow = inner.scrollHeight - box.clientHeight;
+            if (overflow > 8) {
+                const scrollTimeMs = (overflow / PIXELS_PER_SECOND) * 1000;
+                duration = Math.min(Math.max(scrollTimeMs + 4500, BASE_ROTATE_INTERVAL), 45000);
 
-        if (!box || !inner) {
-            startProgressBarAnimation(progressBar, totalSlideTime);
-            return totalSlideTime;
+                inner.style.setProperty('--scroll-distance', `-${overflow}px`);
+                inner.style.animationDuration = `${scrollTimeMs}ms`;
+                setTimeout(() => inner.classList.add('scroll-needed'), 2500);
+            }
         }
 
-        inner.classList.remove('scroll-needed');
-        inner.style.animationDuration = '';
-        inner.style.setProperty('--scroll-distance', '0px');
-
-        const overflow = inner.scrollHeight - box.clientHeight;
-
-        if (overflow > 10) {
-            const pauseStart = 2500;
-            const pauseEnd = 1500;
-            
-            const scrollTimeMs = Math.round((overflow / SCROLL_SPEED_PX_PER_SEC) * 1000);
-            
-            totalSlideTime = Math.min(pauseStart + scrollTimeMs + pauseEnd, MAX_SLIDE_TIME);
-            const actualScrollDuration = totalSlideTime - pauseStart - pauseEnd;
-
-            inner.style.setProperty('--scroll-distance', `-${overflow}px`);
-            inner.style.animationDuration = `${actualScrollDuration}ms`;
-
-            setTimeout(() => {
-                inner.classList.add('scroll-needed');
-            }, pauseStart);
+        const pb = document.getElementById('progress-bar');
+        if (pb) {
+            pb.style.animation = 'none';
+            void pb.offsetWidth;
+            pb.style.animation = `progress ${duration}ms linear forwards`;
         }
 
-        startProgressBarAnimation(progressBar, totalSlideTime);
-        return totalSlideTime;
+        rotationTimer = setTimeout(() => {
+            currentIndex = (currentIndex + 1) % events.length;
+            showEvent(currentIndex);
+        }, duration);
     }
 
-    function startProgressBarAnimation(progressBar, durationMs) {
-        if (!progressBar) return;
-        progressBar.style.animation = 'none';
-        void progressBar.offsetWidth;
-        progressBar.style.animation = `progress ${durationMs}ms linear forwards`;
+    function formatIsoDate(iso) {
+        if (!iso) return "Kuupäev puudub";
+        const d = new Date(iso);
+        return `${d.toLocaleDateString('et-EE', { weekday: 'long', day: 'numeric', month: 'long' })} | kell ${d.toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    function formatCardDate(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        return `${d.toLocaleDateString('et-EE', { day: 'numeric', month: 'short' })} · ${d.toLocaleTimeString('et-EE', { hour: '2-digit', minute: '2-digit' })}`;
     }
 
     function updateQrCode(url) {
-        const qrTarget = document.getElementById("qr-target");
-
-        if (!qrTarget || typeof QRCode === "undefined") {
-            return;
-        }
-
-        qrTarget.innerHTML = "";
-
-        new QRCode(qrTarget, {
-            text: url || "https://kultuuriaken.tartu.ee",
-            width: 220,
-            height: 220,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-        });
+        const target = document.getElementById("qr-target");
+        if (!target) return;
+        target.innerHTML = "";
+        new QRCode(target, { text: url || "https://kultuuriaken.tartu.ee", width: 150, height: 150 });
     }
 
-    function showLoaderMessage(title, detail) {
-        const loader = document.getElementById('loader');
-        if (!loader) return;
-
-        loader.dataset.customError = "1";
-        loader.innerHTML = `
-            <div>${escapeHtml(title)}</div>
-            <div class="error-details">${escapeHtml(detail)}</div>
-        `;
-        loader.style.display = 'flex';
-    }
-
-    function escapeHtml(value) {
-        return String(value || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
-    }
-
-    function escapeAttribute(value) {
-        return escapeHtml(value).replace(/`/g, "&#96;");
-    }
-
-    function escapeCssUrl(value) {
-        return String(value || "")
-            .replace(/\\/g, "\\\\")
-            .replace(/"/g, "%22")
-            .replace(/'/g, "%27")
-            .replace(/\)/g, "%29")
-            .replace(/\(/g, "%28");
-    }
-
-    function capitalizeFirst(value) {
-        value = String(value || "");
-
-        if (!value) {
-            return "";
-        }
-
-        return value.charAt(0).toUpperCase() + value.slice(1);
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-        initAudio();
-        applyAudioSettings();
-        updateClock();
-        updateThemeByTime();
-        loadData();
-    });
-
+    loadData();
     setInterval(loadData, RELOAD_INTERVAL);
 </script>
+
 </body>
 </html>
